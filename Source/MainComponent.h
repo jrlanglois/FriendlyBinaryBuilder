@@ -1,36 +1,30 @@
-/*
-  ==============================================================================
+#ifndef JRL_MAIN_COMPONENT_H
+#define JRL_MAIN_COMPONENT_H
 
-    This file was auto-generated!
+#include "JuceHeader.h"
 
-  ==============================================================================
-*/
-
-#ifndef __MAINCOMPONENT_H_F012E7CB__
-#define __MAINCOMPONENT_H_F012E7CB__
-
-#include "../JuceLibraryCode/JuceHeader.h"
-
-
-//==============================================================================
-/*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
-class MainContentComponent   : public Component
+class MainComponent : public juce::Component
 {
 public:
-    //==============================================================================
-    MainContentComponent();
-    ~MainContentComponent();
+    /**
+    * Constructor
+    */
+    MainComponent();
 
-    void paint (Graphics&);
+    /**
+    * Destructor
+    */
+    ~MainComponent();
+
+    //==============================================================================
+    /** @internal */
+    void paint (juce::Graphics& g);
+    /** @internal */
     void resized();
 
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
 
-
-#endif  // __MAINCOMPONENT_H_F012E7CB__
+#endif //JRL_MAIN_COMPONENT_H

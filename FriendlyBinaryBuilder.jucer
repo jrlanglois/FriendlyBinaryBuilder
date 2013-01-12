@@ -4,10 +4,12 @@
               version="1.0.0" bundleIdentifier="com.jrlanglois.FriendlyBinaryBuilder"
               jucerVersion="3.0.0" companyName="Jo&#235;l R. Langlois">
   <MAINGROUP id="FIUqQX" name="FriendlyBinaryBuilder">
-    <FILE id="eQTPIR" name="MainComponent.cpp" compile="1" resource="0"
+    <FILE id="K1VXrq" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
+    <FILE id="W6Mnnb" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
+    <FILE id="DjO9zb" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+    <FILE id="hHVAyy" name="MainComponent.cpp" compile="1" resource="0"
           file="Source/MainComponent.cpp"/>
-    <FILE id="GjBsih" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
-    <FILE id="WxSwGc" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+    <FILE id="jGUBW3" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0"/>

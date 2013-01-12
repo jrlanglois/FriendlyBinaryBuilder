@@ -210,10 +210,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\MainComponent.cpp">
+    <ClCompile Include="..\..\Source\MainWindow.cpp">
       <Filter>FriendlyBinaryBuilder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Main.cpp">
+      <Filter>FriendlyBinaryBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\MainComponent.cpp">
       <Filter>FriendlyBinaryBuilder</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\juce\modules\juce_core\text\juce_CharacterFunctions.cpp">
@@ -1031,6 +1034,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\MainWindow.h">
+      <Filter>FriendlyBinaryBuilder</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\MainComponent.h">
       <Filter>FriendlyBinaryBuilder</Filter>
     </ClInclude>
