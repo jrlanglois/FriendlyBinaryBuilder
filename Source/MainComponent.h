@@ -1,7 +1,7 @@
 #ifndef JRL_MAIN_COMPONENT_H
 #define JRL_MAIN_COMPONENT_H
 
-#include "JuceHeader.h"
+#include "BinaryBuilder.h"
 
 class MainComponent : public juce::Component
 {
@@ -24,7 +24,10 @@ public:
 
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    BinaryBuilder binaryBuilder;
+
+    //==============================================================================
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent);
 };
 
 #endif //JRL_MAIN_COMPONENT_H
