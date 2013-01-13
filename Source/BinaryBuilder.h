@@ -22,30 +22,40 @@ public:
     /**
     * Constructor
     */
-    BinaryBuilder (const juce::File& sourceDirectory,
-                   const juce::File& destinationDirectory);
+    BinaryBuilder (const juce::File& destinationDirectory);
 
     /**
     * Destructor
     */
-    ~BinaryBuilder();
+    ~BinaryBuilder() noexcept;
 
     //==============================================================================
-    void setSourceDirectory (const juce::File& sourceDirectory);
+    void addFile (const juce::File& file);
+    void addFiles (const juce::Array<juce::File>& files);
+    void clear();
 
     void setDestinationDirectory (const juce::File& destinationDirectory);
 
     //==============================================================================
-    void generateToFiles (const juce::String& className);
+    void generateBinaries (const juce::String& className = BinaryBuilder::defaultClassName);
+
+    //==============================================================================
+    static const juce::String defaultClassName;
 
 private:
     //==============================================================================
-    juce::String className;
-    juce::File sourceDirectory;
     juce::File destinationDirectory;
 
+    juce::Array<juce::File> files;
+
     //==============================================================================
-    bool sourceFolderHasFiles();
+    bool destinationDirectoryExists();
+
+    //==============================================================================
+    /**
+    * This will remove any file that doesn't exist anymore
+    */
+    void removeNonexistentFiles();
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BinaryBuilder);
