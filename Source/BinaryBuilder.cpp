@@ -57,6 +57,24 @@ bool BinaryBuilder::destinationDirectoryExists()
 }
 
 //==============================================================================
+juce::String BinaryBuilder::createValidVersionOfClassName (const juce::String& className) const
+{
+    const juce::String validClassName (className.trim());
+
+    if (validClassName.isEmpty())
+    {
+        juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
+                                           "No class name!",
+                                           "You've not set a class name!\n\nWill use the default one: "
+                                         + defaultClassName,
+                                           "OK"); //"OK" because I personally dislike "ok" (it just feels wrong...)
+
+        return defaultClassName;
+    }
+
+    return validClassName;
+}
+
 void BinaryBuilder::removeNonexistentFiles()
 {
     juce::StringArray removedFilePaths;
@@ -80,21 +98,8 @@ void BinaryBuilder::removeNonexistentFiles()
     }
 }
 
-//==============================================================================
-void BinaryBuilder::generateBinaries (const juce::String& className)
+bool BinaryBuilder::hasValidFiles()
 {
-    jassert (className.isNotEmpty());
-
-    if (files.size() <= 0)
-    {
-        juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
-                                           "No files!",
-                                           "There aren't any files to create binaries from!",
-                                           "OK"); //"OK" because I personally dislike "ok" - just feels wrong...
-
-        return;
-    }
-
     removeNonexistentFiles();
 
     if (files.size() <= 0)
@@ -102,48 +107,59 @@ void BinaryBuilder::generateBinaries (const juce::String& className)
         juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
                                            "No files!",
                                            "There aren't any files to create binaries from!",
-                                           "OK"); //"OK" because I personally dislike "ok" - just feels wrong...
-
-        return;
-    }
-
-    if (destinationDirectory == juce::File::nonexistent)
-    {
-        juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
-                                           "No destination directory!",
-                                           "You must set a destination directory that will be used to contain the generated files!",
                                            "OK");
 
-        return;
+        return false;
     }
 
-    if (! destinationDirectoryExists())
+    return true;
+}
+
+//==============================================================================
+void BinaryBuilder::generateBinaries (const juce::String& className)
+{
+    const juce::String validClassName (createValidVersionOfClassName (className));
+
+    if (hasValidFiles())
     {
-        juce::AlertWindow destDir ("Destination folder does not exist!",
-                                   "Would you like to create the missing folder(s) in the path?",
-                                   juce::AlertWindow::InfoIcon);
-
-        destDir.addButton ("Yes", 0, juce::KeyPress (juce::KeyPress::returnKey));
-        destDir.addButton ("No", 1, juce::KeyPress (juce::KeyPress::escapeKey));
-
-        switch (destDir.runModalLoop())
+        if (destinationDirectory == juce::File::nonexistent)
         {
-            case 0:
-            {
-                if (destinationDirectory.createDirectory().failed())
-                {
-                    juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
-                                                       "Failed creating the directory!",
-                                                       "The path may be invalid or inaccessible. Please select a different folder.",
-                                                       "OK");
-                    return;
-                }
-            }
-            break;
+            juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
+                                               "No destination directory!",
+                                               "You must set a destination directory that will be used to contain the generated files!",
+                                               "OK");
 
-            default:
-                return;
-            break;
-        };
+            return;
+        }
+
+        if (! destinationDirectoryExists())
+        {
+            juce::AlertWindow destDir ("Destination folder does not exist!",
+                                       "Would you like to attempt creating the missing folder(s) in the path?",
+                                       juce::AlertWindow::InfoIcon);
+
+            destDir.addButton ("Yes", 0, juce::KeyPress (juce::KeyPress::returnKey));
+            destDir.addButton ("No", 1, juce::KeyPress (juce::KeyPress::escapeKey));
+
+            switch (destDir.runModalLoop())
+            {
+                case 0:
+                {
+                    if (destinationDirectory.createDirectory().failed())
+                    {
+                        juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
+                                                           "Failed creating the directory!",
+                                                           "The path may be invalid or inaccessible. Please select a different folder.",
+                                                           "OK");
+                        return;
+                    }
+                }
+                break;
+
+                default:
+                    return;
+                break;
+            };
+        }
     }
 }

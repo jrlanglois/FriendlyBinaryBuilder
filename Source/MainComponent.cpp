@@ -7,7 +7,7 @@ MainComponent::MainComponent()
     binaryBuilder.addFile (juce::File ("C:/RHDSetup.log"));
     binaryBuilder.addFile (juce::File ("C:/asdf.asdf"));
     binaryBuilder.setDestinationDirectory (juce::File ("Z:/Bostwich"));
-    binaryBuilder.generateBinaries ("asdf");
+    binaryBuilder.generateBinaries ("");
 }
 
 MainComponent::~MainComponent()

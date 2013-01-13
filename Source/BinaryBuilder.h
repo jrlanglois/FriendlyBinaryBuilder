@@ -45,17 +45,19 @@ public:
 private:
     //==============================================================================
     juce::File destinationDirectory;
-
     juce::Array<juce::File> files;
-
-    //==============================================================================
-    bool destinationDirectoryExists();
 
     //==============================================================================
     /**
     * This will remove any file that doesn't exist anymore
     */
     void removeNonexistentFiles();
+
+    bool hasValidFiles();
+
+    bool destinationDirectoryExists();
+
+    juce::String createValidVersionOfClassName (const juce::String& className) const;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BinaryBuilder);
