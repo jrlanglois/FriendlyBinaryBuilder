@@ -34,12 +34,20 @@ MainComponent::MainComponent()
     setSize (800, 600);
 
     destDirSelector.setButtonText ("Change directory...");
+    destDirSelector.addListener (this);
+
+    destDirectory.setColour (juce::Label::textColourId, juce::Colours::lightgrey);
+    destDirectory.setColour (juce::Label::outlineColourId, juce::Colours::lightgrey);
+    destDirectory.setColour (juce::Label::backgroundColourId, juce::Colours::darkgrey);
     destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName(), false);
 
     className.setText ("Class name:", false);
-    classNameEditor.setText (juce::String::empty, false);
+    className.setJustificationType (juce::Justification::centredRight);
+    classNameEditor.setText (BinaryBuilder::defaultClassName, false);
+    classNameEditor.setInputRestrictions (0, "abcdefghijklmnopqrstuvwxyz1234567890");
 
     generate.setButtonText ("Generate...");
+    generate.addListener (this);
 
     addAndMakeVisible (&currentFiles);
     addAndMakeVisible (&destDirSelector);
@@ -61,13 +69,41 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    currentFiles.setBounds (50, 50, getWidth() - 100, getHeight() - 100);
+    const int normalCompWidth       = 150;
+    const int normalCompHeight      = 25;
+    const int borderThickness       = 5;
+    const int doubleBorderThickness = borderThickness * 2;
 
-    destDirSelector.setBounds (0, 0, 100, 100);
-    destDirectory.setBounds (0, 0, 100, 100);
-    className.setBounds (0, 0, 100, 100);
-    classNameEditor.setBounds (0, 0, 100, 100);
-    generate.setBounds (0, 0, 100, 100);
+    currentFiles.setBounds (borderThickness,
+                            borderThickness,
+                            getWidth() - doubleBorderThickness,
+                            getHeight() - (normalCompHeight * 3) - doubleBorderThickness);
+
+    {
+        const int compY = currentFiles.getBottom() + borderThickness;
+
+        destDirSelector.setBounds (borderThickness, compY, normalCompWidth, normalCompHeight);
+
+        destDirectory.setBounds (destDirSelector.getRight() + borderThickness,
+                                 compY,
+                                 currentFiles.getRight() - destDirSelector.getRight() - borderThickness,
+                                 normalCompHeight);
+    }
+
+    {
+        const int compY = destDirSelector.getBottom() + doubleBorderThickness;
+
+        className.setBounds (borderThickness, compY, normalCompWidth, normalCompHeight);
+        classNameEditor.setBounds (destDirectory.getX(), compY, destDirectory.getWidth() / 2, normalCompHeight);
+
+        classNameEditor.setBounds (className.getRight() + borderThickness,
+                                   compY,
+                                   destDirectory.getWidth() - borderThickness - normalCompWidth,
+                                   normalCompHeight);
+    }
+
+    generate.setSize (normalCompWidth, normalCompHeight);
+    generate.setTopRightPosition (getWidth() - borderThickness, className.getY());
 }
 
 void MainComponent::buttonClicked (juce::Button* button)
