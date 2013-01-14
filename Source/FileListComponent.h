@@ -32,9 +32,9 @@
 
 #include "JuceHeader.h"
 
-class FileListComponent : public juce::Component,
-                          public juce::FileDragAndDropTarget,
-                          private juce::ListBoxModel
+class FileListComponent : public juce::ListBoxModel,
+                          public juce::ListBox,
+                          public juce::FileDragAndDropTarget
 {
 public:
     /**
@@ -52,10 +52,6 @@ public:
 
     //==============================================================================
     /** @internal */
-    void resized();
-    /** @internal */
-    void paint (juce::Graphics& g);
-    /** @internal */
     bool isInterestedInFileDrag (const juce::StringArray& files);
     /** @internal */
     void filesDropped (const juce::StringArray& files, int x, int y);
@@ -67,10 +63,11 @@ public:
     void backgroundClicked();
     /** @internal */
     void deleteKeyPressed (int lastRowSelected);
+    /** @internal */
+    void listBoxItemClicked (int row, const juce::MouseEvent& e);
 
 private:
     //==============================================================================
-    juce::ListBox fileListBox;
     juce::Array<juce::File> files;
 
     //==============================================================================

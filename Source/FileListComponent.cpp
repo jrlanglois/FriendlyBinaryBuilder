@@ -31,14 +31,12 @@
 
 FileListComponent::FileListComponent()
 {
-    fileListBox.setModel (this);
-    fileListBox.setMultipleSelectionEnabled (true);
-    fileListBox.setOutlineThickness (3);
-    fileListBox.setColour (juce::ListBox::backgroundColourId, juce::Colours::darkgrey.brighter().withAlpha (0.5f));
-    fileListBox.setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.25f));
-    fileListBox.setColour (juce::ListBox::textColourId, juce::Colours::lightgrey);
-
-    addAndMakeVisible (&fileListBox);
+    setModel (this);
+    setMultipleSelectionEnabled (true);
+    setOutlineThickness (3);
+    setColour (juce::ListBox::backgroundColourId, juce::Colours::darkgrey.brighter().withAlpha (0.5f));
+    setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.25f));
+    setColour (juce::ListBox::textColourId, juce::Colours::lightgrey);
 }
 
 FileListComponent::~FileListComponent()
@@ -52,15 +50,6 @@ juce::Array<juce::File> FileListComponent::getFiles() const
 }
 
 //==============================================================================
-void FileListComponent::resized()
-{
-    fileListBox.setBounds (getBounds().withPosition (0, 0));
-}
-
-void FileListComponent::paint (juce::Graphics& /*g*/)
-{
-}
-
 bool FileListComponent::isInterestedInFileDrag (const juce::StringArray& /*files*/)
 {
     return true;
@@ -79,7 +68,7 @@ void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, in
         }
     }
 
-    fileListBox.updateContent();
+    updateContent();
 }
 
 int FileListComponent::getNumRows()
@@ -87,11 +76,11 @@ int FileListComponent::getNumRows()
     return files.size();
 }
 
-void FileListComponent::paintListBoxItem (int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected)
+void FileListComponent::paintListBoxItem (int rowNumber, juce::Graphics& g, int width, int height, bool isRowSelected)
 {
-    const juce::Colour textColour (fileListBox.findColour (juce::ListBox::textColourId));
+    const juce::Colour textColour (ListBox::findColour (juce::ListBox::textColourId));
 
-    if (rowIsSelected)
+    if (isRowSelected)
     {
         g.setColour (textColour.darker().darker());
         g.fillAll (juce::Colours::white.darker());
@@ -110,19 +99,34 @@ void FileListComponent::paintListBoxItem (int rowNumber, juce::Graphics& g, int 
 
 void FileListComponent::backgroundClicked()
 {
-    fileListBox.setSelectedRows (juce::SparseSet<int>());
+    setSelectedRows (juce::SparseSet<int>());
 }
 
 void FileListComponent::deleteKeyPressed (int /*lastRowSelected*/)
 {
-    juce::SparseSet<int> selectedRows (fileListBox.getSelectedRows());
+    juce::SparseSet<int> selectedRows (getSelectedRows());
 
     for (int i = 0; i < selectedRows.size(); ++i)
     {
         files.remove (selectedRows[i]);
     }
 
-    fileListBox.updateContent();
+    updateContent();
+}
+
+void FileListComponent::listBoxItemClicked (int row, const juce::MouseEvent& e)
+{
+    if (e.mods.isRightButtonDown())
+    {
+        juce::PopupMenu popup;
+        popup.addItem (1, "Remove");
+
+        if (popup.show() == 1)
+        {
+            files.remove (row);
+            updateContent();
+        }
+    }
 }
 
 //==============================================================================
