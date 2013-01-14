@@ -1035,6 +1035,9 @@
     <ClCompile Include="..\..\Source\BinaryBuilder.cpp">
       <Filter>FriendlyBinaryBuilder</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\FileListComponent.cpp">
+      <Filter>FriendlyBinaryBuilder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\MainWindow.h">
@@ -2013,6 +2016,9 @@
       <Filter>Juce Library Code</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\BinaryBuilder.h">
+      <Filter>FriendlyBinaryBuilder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FileListComponent.h">
       <Filter>FriendlyBinaryBuilder</Filter>
     </ClInclude>
   </ItemGroup>

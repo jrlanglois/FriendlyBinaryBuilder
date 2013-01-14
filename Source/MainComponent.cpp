@@ -3,11 +3,7 @@
 MainComponent::MainComponent()
 {
     setSize (800, 600);
-
-    binaryBuilder.addFile (juce::File ("C:/RHDSetup.log"));
-    binaryBuilder.addFile (juce::File ("C:/asdf.asdf"));
-    binaryBuilder.setDestinationDirectory (juce::File ("Z:/Bostwich"));
-    binaryBuilder.generateBinaries ("");
+    addAndMakeVisible (&currentFiles);
 }
 
 MainComponent::~MainComponent()
@@ -22,4 +18,5 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
+    currentFiles.setBounds (50, 50, getWidth() - 100, getHeight() - 100);
 }

@@ -126,6 +126,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\BinaryBuilder.cpp" />
+    <ClCompile Include="..\..\Source\FileListComponent.cpp" />
     <ClCompile Include="..\..\Source\MainWindow.cpp" />
     <ClCompile Include="..\..\Source\Main.cpp" />
     <ClCompile Include="..\..\Source\MainComponent.cpp" />
@@ -931,6 +932,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\BinaryBuilder.h" />
+    <ClInclude Include="..\..\Source\FileListComponent.h" />
     <ClInclude Include="..\..\Source\MainWindow.h" />
     <ClInclude Include="..\..\Source\MainComponent.h" />
     <ClInclude Include="..\..\..\juce\modules\juce_core\text\juce_CharacterFunctions.h" />

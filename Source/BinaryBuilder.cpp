@@ -116,50 +116,57 @@ bool BinaryBuilder::hasValidFiles()
 }
 
 //==============================================================================
+bool BinaryBuilder::hasValidDestinationDirectory()
+{
+    if (destinationDirectory == juce::File::nonexistent)
+    {
+        juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
+                                            "No destination directory!",
+                                            "You must set a destination directory that will be used to contain the generated files!",
+                                            "OK");
+
+        return false;
+    }
+
+    if (! destinationDirectoryExists())
+    {
+        juce::AlertWindow destDir ("Destination folder does not exist!",
+                                    "Would you like to attempt creating the missing folder(s) in the path?",
+                                    juce::AlertWindow::InfoIcon);
+
+        destDir.addButton ("Yes", 0, juce::KeyPress (juce::KeyPress::returnKey));
+        destDir.addButton ("No", 1, juce::KeyPress (juce::KeyPress::escapeKey));
+
+        switch (destDir.runModalLoop())
+        {
+            case 0:
+            {
+                if (destinationDirectory.createDirectory().failed())
+                {
+                    juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
+                                                        "Failed creating the directory!",
+                                                        "The path may be invalid or inaccessible. Please select a different folder.",
+                                                        "OK");
+                    return false;
+                }
+            }
+            break;
+
+            default:
+                return false;
+            break;
+        };
+    }
+
+    return true;
+}
+
+//==============================================================================
 void BinaryBuilder::generateBinaries (const juce::String& className)
 {
     const juce::String validClassName (createValidVersionOfClassName (className));
 
-    if (hasValidFiles())
+    if (hasValidFiles() && hasValidDestinationDirectory())
     {
-        if (destinationDirectory == juce::File::nonexistent)
-        {
-            juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
-                                               "No destination directory!",
-                                               "You must set a destination directory that will be used to contain the generated files!",
-                                               "OK");
-
-            return;
-        }
-
-        if (! destinationDirectoryExists())
-        {
-            juce::AlertWindow destDir ("Destination folder does not exist!",
-                                       "Would you like to attempt creating the missing folder(s) in the path?",
-                                       juce::AlertWindow::InfoIcon);
-
-            destDir.addButton ("Yes", 0, juce::KeyPress (juce::KeyPress::returnKey));
-            destDir.addButton ("No", 1, juce::KeyPress (juce::KeyPress::escapeKey));
-
-            switch (destDir.runModalLoop())
-            {
-                case 0:
-                {
-                    if (destinationDirectory.createDirectory().failed())
-                    {
-                        juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
-                                                           "Failed creating the directory!",
-                                                           "The path may be invalid or inaccessible. Please select a different folder.",
-                                                           "OK");
-                        return;
-                    }
-                }
-                break;
-
-                default:
-                    return;
-                break;
-            };
-        }
     }
 }
