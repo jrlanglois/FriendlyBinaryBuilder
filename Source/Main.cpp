@@ -32,8 +32,8 @@
 class FriendlyBinaryBuilderApplication : public juce::JUCEApplication
 {
 public:
-    FriendlyBinaryBuilderApplication()  { }
-    ~FriendlyBinaryBuilderApplication() { }
+    FriendlyBinaryBuilderApplication()          { }
+    ~FriendlyBinaryBuilderApplication()         { }
 
     //==============================================================================
     const juce::String getApplicationName()     { return ProjectInfo::projectName; }
@@ -49,16 +49,6 @@ public:
     void shutdown()
     {
         mainWindow = nullptr;
-    }
-
-    //==============================================================================
-    void systemRequestedQuit()
-    {
-        quit();
-    }
-
-    void anotherInstanceStarted (const juce::String& /*commandLine*/)
-    {
     }
 
 private:
