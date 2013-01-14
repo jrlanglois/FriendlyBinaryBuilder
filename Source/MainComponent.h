@@ -34,7 +34,7 @@
 #include "FileListComponent.h"
 
 class MainComponent : public juce::Component,
-                      private juce::Button::Listener
+                      private juce::Button::Listener //Sorry - I don't believe in using VS2005 in today's day and age
 {
 public:
     /**

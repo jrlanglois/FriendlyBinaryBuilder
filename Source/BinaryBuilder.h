@@ -36,7 +36,8 @@
 * @file BinaryBuilder.h
 *
 * Simple class used to generate header and cpp files containing binary
-* data that was based of files located in the source directory.
+* data based off of the added files. The generated files will be placed
+* in the set destination directory.
 *
 * @authors Joël R. Langlois, Julian Storer (credited for original code)
 */

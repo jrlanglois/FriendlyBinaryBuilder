@@ -196,7 +196,7 @@ void BinaryBuilder::generateBinaries (const juce::String& className)
 {
     const juce::String validClassName (createValidVersionOfClassName (className));
 
-    if (hasValidFiles() && hasValidDestinationDirectory())
+    if (hasValidDestinationDirectory() && hasValidFiles())
     {
     }
 }
