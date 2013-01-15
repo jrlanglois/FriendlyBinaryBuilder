@@ -4,12 +4,19 @@
               version="1.0.0" bundleIdentifier="com.jrlanglois.FriendlyBinaryBuilder"
               jucerVersion="3.0.0" companyName="Jo&#235;l R. Langlois">
   <MAINGROUP id="FIUqQX" name="FriendlyBinaryBuilder">
-    <FILE id="K1VXrq" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
-    <FILE id="W6Mnnb" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
-    <FILE id="DjO9zb" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-    <FILE id="hHVAyy" name="MainComponent.cpp" compile="1" resource="0"
+    <FILE id="OTVT9L" name="MainComponent.cpp" compile="1" resource="0"
           file="Source/MainComponent.cpp"/>
-    <FILE id="jGUBW3" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+    <FILE id="aYZy0r" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+    <FILE id="oSSdQv" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
+    <FILE id="fJ3Puq" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
+    <FILE id="Ic9lZO" name="BinaryBuilder.cpp" compile="1" resource="0"
+          file="Source/BinaryBuilder.cpp"/>
+    <FILE id="KA6wHd" name="BinaryBuilder.h" compile="0" resource="0" file="Source/BinaryBuilder.h"/>
+    <FILE id="Ro2Q0F" name="FileListComponent.cpp" compile="1" resource="0"
+          file="Source/FileListComponent.cpp"/>
+    <FILE id="GNMbWc" name="FileListComponent.h" compile="0" resource="0"
+          file="Source/FileListComponent.h"/>
+    <FILE id="OxhYT3" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0"/>
