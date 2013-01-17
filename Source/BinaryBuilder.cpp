@@ -75,8 +75,6 @@ void BinaryBuilder::clear()
 void BinaryBuilder::setDestinationDirectory (const juce::File& destDir)
 {
     destinationDirectory = destDir;
-
-    jassert (destinationDirectoryExists());
 }
 
 bool BinaryBuilder::destinationDirectoryExists()

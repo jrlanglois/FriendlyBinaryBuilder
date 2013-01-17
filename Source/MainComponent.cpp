@@ -44,8 +44,9 @@ MainComponent::MainComponent()
 
     className.setText ("Class name:", false);
     className.setJustificationType (juce::Justification::centredRight);
+    className.setColour (juce::Label::textColourId, juce::Colours::white);
     classNameEditor.setText (BinaryBuilder::defaultClassName, false);
-    classNameEditor.setInputRestrictions (0, "abcdefghijklmnopqrstuvwxyz1234567890");
+    classNameEditor.setInputRestrictions (0, "abcdefghijklmnopqrstuvwxyz1234567890-_");
 
     generate.setButtonText ("Generate...");
     generate.addListener (this);
