@@ -76,6 +76,7 @@ private:
     //==============================================================================
     juce::File destinationDirectory;
     juce::Array<juce::File> files;
+    int tempNumber;
 
     //==============================================================================
     juce::String createValidVersionOfClassName (const juce::String& className) const;
@@ -89,6 +90,20 @@ private:
     bool destinationDirectoryExists();
 
     bool hasValidDestinationDirectory();
+
+    //==============================================================================
+    static juce::String temporaryVariableName() noexcept;
+
+    void setupHeader (const juce::String& className,
+                      juce::OutputStream& headerStream);
+
+    void setupCPP (const juce::String& className,
+                   juce::OutputStream& cppStream);
+
+    int createDataFromFile (const juce::File& file,
+                            const juce::String& className,
+                            juce::OutputStream& headerStream,
+                            juce::OutputStream& cppStream);
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BinaryBuilder);

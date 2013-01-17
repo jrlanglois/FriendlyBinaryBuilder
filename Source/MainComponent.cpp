@@ -121,6 +121,10 @@ void MainComponent::buttonClicked (juce::Button* button)
     else if (button == &generate)
     {
         binaryBuilder.setDestinationDirectory (destDirectory.getText().trim());
+
+        binaryBuilder.clear();
+        binaryBuilder.addFiles (currentFiles.getFiles());
+
         binaryBuilder.generateBinaries (classNameEditor.getText().trim());
     }
 }

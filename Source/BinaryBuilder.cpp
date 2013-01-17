@@ -192,11 +192,106 @@ bool BinaryBuilder::hasValidDestinationDirectory()
 }
 
 //==============================================================================
+void BinaryBuilder::setupHeader (const juce::String& className,
+                                 juce::OutputStream& headerStream)
+{
+    headerStream << "#ifndef " << className.toUpperCase() << "_H\r\n"
+                    "#define " << className.toUpperCase() << "_H\r\n\r\n"
+                    "/**\r\n"
+                    "* @file " << className << ".h\r\n"
+                    "* @date " << juce::Time::getCurrentTime().toString (true, true, true, true) << "\r\n"
+                    "*\r\n"
+                    "* Automatically generated binary data\r\n"
+                    "*/\r\n"
+                    "namespace " << className << "\r\n"
+                    "{\r\n";
+}
+
+void BinaryBuilder::setupCPP (const juce::String& className,
+                              juce::OutputStream& cppStream)
+{
+    cppStream << "#include \"" << className << ".h\"\r\n\r\n";
+}
+
+juce::String BinaryBuilder::temporaryVariableName() noexcept
+{
+    return "internalTemp";
+}
+
+int BinaryBuilder::createDataFromFile (const juce::File& file,
+                                       const juce::String& className,
+                                       juce::OutputStream& headerStream,
+                                       juce::OutputStream& cppStream)
+{
+    juce::MemoryBlock mb;
+    file.loadFileAsData (mb);
+
+    const juce::String name (file.getFileName()
+                             .replaceCharacter (' ', '_')
+                             .replaceCharacter ('.', '_')
+                             .retainCharacters ("abcdefghijklmnopqrstuvwxyz_0123456789"));
+
+    headerStream << "    extern const char*  " << name << ";\r\n"
+                    "    const int           " << name << "Size = "
+                 << (int) mb.getSize() << ";\r\n\r\n";
+
+    cppStream << "static const unsigned char " << temporaryVariableName() << ++tempNumber << "[] = {";
+
+    size_t i = 0;
+    const juce::uint8* const data = (const juce::uint8*) mb.getData();
+
+    while (i < (mb.getSize() - 1))
+    {
+        if ((i % 40) != 39)
+            cppStream << (int) data[i] << ",";
+        else
+            cppStream << (int) data[i] << ",\r\n ";
+
+        ++i;
+    }
+
+    cppStream << (int) data[i] << ",0,0};\r\n";
+
+    cppStream << "const char* " << className << "::" << name
+              << " = (const char*)" << temporaryVariableName() << tempNumber << ";\r\n\r\n";
+
+    return mb.getSize();
+}
+
 void BinaryBuilder::generateBinaries (const juce::String& className)
 {
     const juce::String validClassName (createValidVersionOfClassName (className));
 
     if (hasValidDestinationDirectory() && hasValidFiles())
     {
+        const juce::File headerFile (destinationDirectory.getChildFile (className).withFileExtension (".h"));
+        const juce::File cppFile    (destinationDirectory.getChildFile (className).withFileExtension (".cpp"));
+
+        headerFile.deleteFile();
+        cppFile.deleteFile();
+
+        juce::ScopedPointer<juce::OutputStream> header (headerFile.createOutputStream());
+        juce::ScopedPointer<juce::OutputStream> cpp (cppFile.createOutputStream());
+
+        jassert (header != nullptr); //File is probably in use...
+        jassert (cpp != nullptr); //File is probably in use...
+
+        if (header != nullptr && cpp != nullptr)
+        {
+            setupHeader (className, *header);
+            setupCPP (className, *cpp);
+
+            tempNumber = 0;
+
+            for (int i = 0; i < files.size(); ++i)
+            {
+                createDataFromFile (files[i], className, *header, *cpp);
+            }
+
+            *header << "}\r\n\r\n"
+                       "#endif //" << className.toUpperCase() << "_H";
+
+            header = cpp = nullptr;
+        }
     }
 }
