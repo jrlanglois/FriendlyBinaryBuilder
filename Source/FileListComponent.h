@@ -56,6 +56,10 @@ public:
     /** @internal */
     void filesDropped (const juce::StringArray& files, int x, int y);
     /** @internal */
+    void fileDragEnter (const juce::StringArray& files, int x, int y);
+    /** @internal */
+    void fileDragExit (const juce::StringArray& files);
+    /** @internal */
     int getNumRows();
     /** @internal */
     void paintListBoxItem (int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected);
@@ -71,7 +75,7 @@ private:
     juce::Array<juce::File> files;
 
     //==============================================================================
-    static bool isSourceControlFile (const juce::File& file);
+    bool isSourceControlFile (const juce::File& file) const;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FileListComponent);

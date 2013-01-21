@@ -35,7 +35,7 @@ FileListComponent::FileListComponent()
     setMultipleSelectionEnabled (true);
     setOutlineThickness (2);
     setColour (juce::ListBox::backgroundColourId, juce::Colours::darkgrey.brighter().withAlpha (0.5f));
-    setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.25f));
+    setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.5f));
     setColour (juce::ListBox::textColourId, juce::Colours::lightgrey);
 }
 
@@ -69,8 +69,21 @@ void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, in
     }
 
     updateContent();
+
+    setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.5f));
 }
 
+void FileListComponent::fileDragEnter (const juce::StringArray& /*files*/, int /*x*/, int /*y*/)
+{
+    setColour (juce::ListBox::outlineColourId, juce::Colours::red.withAlpha (0.5f));
+}
+
+void FileListComponent::fileDragExit (const juce::StringArray& /*files*/)
+{
+    setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.5f));
+}
+
+//==============================================================================
 int FileListComponent::getNumRows()
 {
     return files.size();
@@ -130,7 +143,7 @@ void FileListComponent::listBoxItemClicked (int row, const juce::MouseEvent& e)
 }
 
 //==============================================================================
-bool FileListComponent::isSourceControlFile (const juce::File& file)
+bool FileListComponent::isSourceControlFile (const juce::File& file) const
 {
     return file.getFileName().endsWithIgnoreCase (".scc")
         || file.getFileName() == ".svn"
