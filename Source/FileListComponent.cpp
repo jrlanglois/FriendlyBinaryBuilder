@@ -44,7 +44,7 @@ FileListComponent::~FileListComponent()
 }
 
 //==============================================================================
-juce::Array<juce::File> FileListComponent::getFiles() const
+juce::Array<juce::File> FileListComponent::getFiles() const noexcept
 {
     return files;
 }
@@ -57,17 +57,22 @@ bool FileListComponent::isInterestedInFileDrag (const juce::StringArray& /*files
 
 void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, int /*x*/, int /*y*/)
 {
+    //Add valid files:
     for (int i = 0; i < incomingFiles.size(); ++i)
     {
         const juce::File file (incomingFiles[i]);
 
-        if (! isSourceControlFile (file)
-           && file.existsAsFile())
+        if (file.isDirectory())
         {
-            files.addIfNotAlreadyThere (file);
+            addRecursively (file);            
+        }
+        else
+        {
+            addFileIfValid (file);
         }
     }
 
+    //Update the table:
     updateContent();
 
     setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.5f));
@@ -131,13 +136,26 @@ void FileListComponent::listBoxItemClicked (int row, const juce::MouseEvent& e)
 {
     if (e.mods.isRightButtonDown())
     {
-        juce::PopupMenu popup;
-        popup.addItem (1, "Remove");
-
-        if (popup.show() == 1)
+        enum Options
         {
-            files.remove (row);
-            updateContent();
+            Remove          = 1,
+            ShowInFolder
+        };
+
+        juce::PopupMenu popup;
+        popup.addItem (Remove, "Remove");
+        popup.addItem (ShowInFolder, "Show in folder...");
+
+        switch (popup.show())
+        {
+            case Remove:
+                files.remove (row);
+                updateContent();
+            break;
+
+            case ShowInFolder:
+                files[row].revealToUser();
+            break;
         }
     }
 }
@@ -148,4 +166,24 @@ bool FileListComponent::isSourceControlFile (const juce::File& file) const
     return file.getFileName().endsWithIgnoreCase (".scc")
         || file.getFileName() == ".svn"
         || file.getFileName() == ".gitignore";
+}
+
+void FileListComponent::addFileIfValid (const juce::File& file)
+{
+    if (! isSourceControlFile (file)
+     && file.existsAsFile())
+    {
+        files.addIfNotAlreadyThere (file);
+    } 
+}
+
+void FileListComponent::addRecursively (const juce::File& directory)
+{
+    juce::Array<juce::File> files;
+    directory.findChildFiles (files, juce::File::findFilesAndDirectories, true);
+
+    for (int i = 0; i < files.size(); ++i)
+    {
+        addFileIfValid (files[i]);
+    }
 }

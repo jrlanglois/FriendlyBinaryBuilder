@@ -48,7 +48,7 @@ public:
     ~FileListComponent();
 
     //==============================================================================
-    juce::Array<juce::File> getFiles() const;
+    juce::Array<juce::File> getFiles() const noexcept;
 
     //==============================================================================
     /** @internal */
@@ -76,6 +76,10 @@ private:
 
     //==============================================================================
     bool isSourceControlFile (const juce::File& file) const;
+
+    void addFileIfValid (const juce::File& file);
+
+    void addRecursively (const juce::File& directory);
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FileListComponent);

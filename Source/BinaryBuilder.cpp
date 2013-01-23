@@ -93,8 +93,7 @@ juce::String BinaryBuilder::createValidVersionOfClassName (const juce::String& c
     {
         juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
                                            "No class name!",
-                                           "You've not set a class name!\n\nWill use the default one: "
-                                         + defaultClassName,
+                                           "You've not set a class name!\n\nWill use the default one: " + defaultClassName,
                                            "OK"); //"OK" because I personally dislike "ok" (it just feels wrong...)
 
         return defaultClassName;
@@ -149,9 +148,9 @@ bool BinaryBuilder::hasValidDestinationDirectory()
     if (destinationDirectory == juce::File::nonexistent)
     {
         juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
-                                            "No destination directory!",
-                                            "You must set a destination directory that will be used to contain the generated files!",
-                                            "OK");
+                                           "No destination directory!",
+                                           "You must set a destination directory that will be used to contain the generated files!",
+                                           "OK");
 
         return false;
     }
@@ -159,8 +158,8 @@ bool BinaryBuilder::hasValidDestinationDirectory()
     if (! destinationDirectoryExists())
     {
         juce::AlertWindow destDir ("Destination folder does not exist!",
-                                    "Would you like to attempt creating the missing folder(s) in the path?",
-                                    juce::AlertWindow::InfoIcon);
+                                   "Would you like to attempt creating the missing folder(s) in the path?",
+                                   juce::AlertWindow::InfoIcon);
 
         destDir.addButton ("Yes", 0, juce::KeyPress (juce::KeyPress::returnKey));
         destDir.addButton ("No", 1, juce::KeyPress (juce::KeyPress::escapeKey));
@@ -172,9 +171,9 @@ bool BinaryBuilder::hasValidDestinationDirectory()
                 if (destinationDirectory.createDirectory().failed())
                 {
                     juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
-                                                        "Failed creating the directory!",
-                                                        "The path may be invalid or inaccessible. Please select a different folder.",
-                                                        "OK");
+                                                       "Failed creating the directory!",
+                                                       "The path may be invalid or inaccessible. Please select a different folder.",
+                                                       "OK");
                     return false;
                 }
             }
@@ -236,7 +235,7 @@ int BinaryBuilder::createDataFromFile (const juce::File& file,
     cppStream << "static const unsigned char " << temporaryVariableName() << ++tempNumber << "[] = {";
 
     size_t i = 0;
-    const juce::uint8* const data = (const juce::uint8*) mb.getData();
+    const juce::uint8* const data = (const juce::uint8*)mb.getData();
 
     while (i < (mb.getSize() - 1))
     {
