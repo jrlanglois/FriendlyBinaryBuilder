@@ -27,42 +27,18 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
     IN THE SOFTWARE.
 */
-#include "MainWindow.h"
-#include "CustomLookAndFeel.h"
+#ifndef JRL_CUSTOM_LOOK_AND_FEEL_H
+#define JRL_CUSTOM_LOOK_AND_FEEL_H
 
-class FriendlyBinaryBuilderApplication : public juce::JUCEApplication
+#include "JuceHeader.h"
+
+class CustomLookAndFeel : public juce::LookAndFeel
 {
 public:
-    FriendlyBinaryBuilderApplication()          { }
-    ~FriendlyBinaryBuilderApplication()         { }
-
-    //==============================================================================
-    const juce::String getApplicationName()     { return ProjectInfo::projectName; }
-    const juce::String getApplicationVersion()  { return ProjectInfo::versionString; }
-    bool moreThanOneInstanceAllowed()           { return true; }
-
-    //==============================================================================
-    void initialise (const juce::String& /*commandLine*/)
-    {
-        juce::LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
-
-        mainWindow = new MainWindow();
-    }
-
-    void shutdown()
-    {
-        mainWindow = nullptr;
-    }
+    CustomLookAndFeel();
+    ~CustomLookAndFeel();
 
 private:
-    //==============================================================================
-    juce::ScopedPointer<MainWindow> mainWindow;
-    CustomLookAndFeel lookAndFeel;
-
-    //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FriendlyBinaryBuilderApplication)
 };
 
-//==============================================================================
-// This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION (FriendlyBinaryBuilderApplication)
+#endif //JRL_CUSTOM_LOOK_AND_FEEL_H
