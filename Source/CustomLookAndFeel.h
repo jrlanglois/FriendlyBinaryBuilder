@@ -38,6 +38,18 @@ public:
     CustomLookAndFeel();
     ~CustomLookAndFeel();
 
+    //==============================================================================
+    juce::Font getTextButtonFont (juce::TextButton& button);
+
+    juce::Font getComboBoxFont (juce::ComboBox& box);
+
+    juce::Font getLabelFont (juce::Label& label);
+
+    juce::Font getAlertWindowMessageFont();
+    juce::Font getAlertWindowFont();
+    juce::Font getPopupMenuFont();
+    juce::Font getMenuBarFont (juce::MenuBarComponent& menuBar, int itemIndex, const juce::String& itemText);
+
 private:
 };
 

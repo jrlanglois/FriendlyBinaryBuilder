@@ -33,6 +33,12 @@ MainComponent::MainComponent()
 {
     setSize (800, 600);
 
+    const juce::Colour buttonColour = juce::Colours::blue.brighter().brighter();
+
+    destDirSelector.setColour (juce::TextButton::buttonColourId, buttonColour);
+    destDirSelector.setColour (juce::TextButton::buttonOnColourId, buttonColour.brighter (0.75f));
+    destDirSelector.setColour (juce::TextButton::textColourOffId, juce::Colours::black);
+    destDirSelector.setColour (juce::TextButton::textColourOnId, juce::Colours::black);
     destDirSelector.setButtonText ("Change directory...");
     destDirSelector.addListener (this);
 
@@ -48,6 +54,10 @@ MainComponent::MainComponent()
     classNameEditor.setText (BinaryBuilder::defaultClassName, false);
     classNameEditor.setInputRestrictions (0, "abcdefghijklmnopqrstuvwxyz1234567890-_");
 
+    generate.setColour (juce::TextButton::buttonColourId, buttonColour);
+    generate.setColour (juce::TextButton::buttonOnColourId, buttonColour.brighter (0.75f));
+    generate.setColour (juce::TextButton::textColourOffId, juce::Colours::black);
+    generate.setColour (juce::TextButton::textColourOnId, juce::Colours::black);
     generate.setButtonText ("Generate...");
     generate.addListener (this);
 
