@@ -52,7 +52,11 @@ MainComponent::MainComponent()
     className.setJustificationType (juce::Justification::centredRight);
     className.setColour (juce::Label::textColourId, juce::Colours::white);
     classNameEditor.setText (BinaryBuilder::defaultClassName, false);
-    classNameEditor.setInputRestrictions (0, "abcdefghijklmnopqrstuvwxyz1234567890-_");
+
+    {
+        const juce::String chars = "abcdefghijklmnopqrstuvwxyz";
+        classNameEditor.setInputRestrictions (0, "1234567890-_" + chars.toLowerCase() + chars.toUpperCase());
+    }
 
     generate.setColour (juce::TextButton::buttonColourId, buttonColour);
     generate.setColour (juce::TextButton::buttonOnColourId, buttonColour.brighter (0.75f));
