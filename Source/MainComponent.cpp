@@ -45,10 +45,10 @@ MainComponent::MainComponent()
     destDirectory.setColour (juce::Label::textColourId, juce::Colours::lightgrey);
     destDirectory.setColour (juce::Label::outlineColourId, juce::Colours::lightgrey);
     destDirectory.setColour (juce::Label::backgroundColourId, juce::Colours::darkgrey);
-    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName(), false);
+    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName(), juce::dontSendNotification);
     destDirectory.setEditable (false, true, false);
 
-    className.setText ("Class name:", false);
+    className.setText ("Class name:", juce::dontSendNotification);
     className.setJustificationType (juce::Justification::centredRight);
     className.setColour (juce::Label::textColourId, juce::Colours::white);
     classNameEditor.setText (BinaryBuilder::defaultClassName, false);
@@ -130,7 +130,7 @@ void MainComponent::buttonClicked (juce::Button* button)
         
         if (chooser.browseForDirectory())
         {
-            destDirectory.setText (chooser.getResult().getFullPathName(), true);
+            destDirectory.setText (chooser.getResult().getFullPathName(), juce::sendNotification);
         }
     }
     else if (button == &generate)
