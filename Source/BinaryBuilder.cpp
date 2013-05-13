@@ -174,6 +174,7 @@ bool BinaryBuilder::hasValidDestinationDirectory()
                                                        "Failed creating the directory!",
                                                        "The path may be invalid or inaccessible. Please select a different folder.",
                                                        "OK");
+
                     return false;
                 }
             }
@@ -223,34 +224,40 @@ int BinaryBuilder::createDataFromFile (const juce::File& file,
     juce::MemoryBlock mb;
     file.loadFileAsData (mb);
 
+    const juce::String chars = "abcdefghijklmnopqrstuvwxyz";
     const juce::String name (file.getFileName()
                              .replaceCharacter (' ', '_')
                              .replaceCharacter ('.', '_')
-                             .retainCharacters ("abcdefghijklmnopqrstuvwxyz_0123456789"));
+                             .retainCharacters ("_0123456789" + chars.toLowerCase() + chars.toUpperCase()));
 
     headerStream << "    extern const char*  " << name << ";\r\n"
                     "    const int           " << name << "Size = "
                  << (int) mb.getSize() << ";\r\n\r\n";
 
-    cppStream << "static const unsigned char " << temporaryVariableName() << ++tempNumber << "[] = {";
+    cppStream << "static const unsigned char " << temporaryVariableName() << ++tempNumber << "[] = \r\n{\r\n    ";
 
     size_t i = 0;
-    const juce::uint8* const data = (const juce::uint8*)mb.getData();
+    const juce::uint8* const data = (const juce::uint8*) mb.getData();
 
     while (i < (mb.getSize() - 1))
     {
-        if ((i % 40) != 39)
+        if ((i % 30) != 29)
+        {
             cppStream << (int) data[i] << ",";
+        }
         else
-            cppStream << (int) data[i] << ",\r\n ";
+        {
+            cppStream << (int) data[i] << ",\r\n    ";
+        }
 
         ++i;
     }
 
-    cppStream << (int) data[i] << ",0,0};\r\n";
+    cppStream << (int) data[i] << ",0,0" << "\r\n};\r\n\r\n";
 
     cppStream << "const char* " << className << "::" << name
-              << " = (const char*)" << temporaryVariableName() << tempNumber << ";\r\n\r\n";
+              << " = (const char*) " << temporaryVariableName() << tempNumber << ";\r\n\r\n"
+              << "//==============================================================================";
 
     return mb.getSize();
 }
@@ -262,7 +269,7 @@ void BinaryBuilder::generateBinaries (const juce::String& className)
     if (hasValidDestinationDirectory() && hasValidFiles())
     {
         const juce::File headerFile (destinationDirectory.getChildFile (className).withFileExtension (".h"));
-        const juce::File cppFile    (destinationDirectory.getChildFile (className).withFileExtension (".cpp"));
+        const juce::File cppFile (destinationDirectory.getChildFile (className).withFileExtension (".cpp"));
 
         headerFile.deleteFile();
         cppFile.deleteFile();

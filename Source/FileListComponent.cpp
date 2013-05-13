@@ -34,9 +34,9 @@ FileListComponent::FileListComponent()
     setModel (this);
     setMultipleSelectionEnabled (true);
     setOutlineThickness (2);
-    setColour (juce::ListBox::backgroundColourId, juce::Colours::darkgrey.brighter().withAlpha (0.5f));
     setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.5f));
     setColour (juce::ListBox::textColourId, juce::Colours::lightgrey);
+    setColour (juce::ListBox::backgroundColourId, juce::Colours::darkgrey.brighter().withAlpha (0.5f));
 }
 
 FileListComponent::~FileListComponent()
