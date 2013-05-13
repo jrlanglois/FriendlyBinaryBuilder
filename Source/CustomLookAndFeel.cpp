@@ -41,8 +41,8 @@ juce::Font CustomLookAndFeel::getPopupMenuFont()
 }
 
 juce::Font CustomLookAndFeel::getMenuBarFont (juce::MenuBarComponent& menuBar,
-                                              const int itemIndex,
-                                              const juce::String& itemText)
+                                              const int /*itemIndex*/,
+                                              const juce::String& /*itemText*/)
 {
     return juce::Font ("Calibri", "Regular", menuBar.getHeight() * 0.75f);
 }

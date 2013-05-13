@@ -45,14 +45,7 @@ MainComponent::MainComponent()
     destDirectory.setColour (juce::Label::textColourId, juce::Colours::lightgrey);
     destDirectory.setColour (juce::Label::outlineColourId, juce::Colours::lightgrey);
     destDirectory.setColour (juce::Label::backgroundColourId, juce::Colours::darkgrey);
-
-    #ifdef JUCE_WINDOWS
-        const juce::String customFolder = "\\GeneratedBinaries\\";
-    #else
-        const juce::String customFolder = "/GeneratedBinaries/";
-    #endif
-
-    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName() + customFolder, juce::dontSendNotification);
+    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName(), juce::dontSendNotification);
     destDirectory.setEditable (false, true, false);
 
     className.setText ("Class name:", juce::dontSendNotification);
