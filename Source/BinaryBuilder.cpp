@@ -53,17 +53,13 @@ void BinaryBuilder::addFile (const juce::File& file)
     jassert (file.existsAsFile());
 
     if (file.existsAsFile())
-    {
         files.addIfNotAlreadyThere (file);
-    }
 }
 
 void BinaryBuilder::addFiles (const juce::Array<juce::File>& newFiles)
 {
     for (int i = 0; i < newFiles.size(); ++i)
-    {
         addFile (newFiles[i]);
-    }
 }
 
 void BinaryBuilder::clear()

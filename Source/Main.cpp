@@ -33,8 +33,8 @@
 class FriendlyBinaryBuilderApplication : public juce::JUCEApplication
 {
 public:
-    FriendlyBinaryBuilderApplication()          { }
-    ~FriendlyBinaryBuilderApplication()         { }
+    FriendlyBinaryBuilderApplication() { }
+    ~FriendlyBinaryBuilderApplication() { }
 
     //==============================================================================
     const juce::String getApplicationName()     { return ProjectInfo::projectName; }

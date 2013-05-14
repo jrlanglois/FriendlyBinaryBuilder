@@ -2,21 +2,25 @@
 
 <JUCERPROJECT id="G4DIoh" name="FriendlyBinaryBuilder" projectType="guiapp"
               version="1.0.0" bundleIdentifier="com.jrlanglois.FriendlyBinaryBuilder"
-              jucerVersion="3.0.0" companyName="Jo&#235;l R. Langlois">
+              jucerVersion="3.1.0" companyName="Jo&#235;l R. Langlois">
   <MAINGROUP id="FIUqQX" name="FriendlyBinaryBuilder">
-    <FILE id="OTVT9L" name="MainComponent.cpp" compile="1" resource="0"
+    <FILE id="HEpMx1" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+    <FILE id="UvZzfN" name="MainComponent.cpp" compile="1" resource="0"
           file="Source/MainComponent.cpp"/>
-    <FILE id="aYZy0r" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
-    <FILE id="oSSdQv" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
-    <FILE id="fJ3Puq" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
-    <FILE id="Ic9lZO" name="BinaryBuilder.cpp" compile="1" resource="0"
+    <FILE id="fh3rjb" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+    <FILE id="z19s7v" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
+    <FILE id="vJvQDt" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
+    <FILE id="z0IVtN" name="BinaryBuilder.cpp" compile="1" resource="0"
           file="Source/BinaryBuilder.cpp"/>
-    <FILE id="KA6wHd" name="BinaryBuilder.h" compile="0" resource="0" file="Source/BinaryBuilder.h"/>
-    <FILE id="Ro2Q0F" name="FileListComponent.cpp" compile="1" resource="0"
+    <FILE id="vGEpUe" name="BinaryBuilder.h" compile="0" resource="0" file="Source/BinaryBuilder.h"/>
+    <FILE id="PB8JxS" name="CustomLookAndFeel.cpp" compile="1" resource="0"
+          file="Source/CustomLookAndFeel.cpp"/>
+    <FILE id="Q1AdyY" name="CustomLookAndFeel.h" compile="0" resource="0"
+          file="Source/CustomLookAndFeel.h"/>
+    <FILE id="vy4kOV" name="FileListComponent.cpp" compile="1" resource="0"
           file="Source/FileListComponent.cpp"/>
-    <FILE id="GNMbWc" name="FileListComponent.h" compile="0" resource="0"
+    <FILE id="QBVNS6" name="FileListComponent.h" compile="0" resource="0"
           file="Source/FileListComponent.h"/>
-    <FILE id="OxhYT3" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0"/>
@@ -77,6 +81,12 @@
                        targetName="FriendlyBinaryBuilder"/>
       </CONFIGURATIONS>
     </XCODE_IPHONE>
+    <CODEBLOCKS targetFolder="Builds/CodeBlocks" juceFolder="C:\Users\UUO\Documents\Work\juce\modules">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="FriendlyBinaryBuilder"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="2" targetName="FriendlyBinaryBuilder"/>
+      </CONFIGURATIONS>
+    </CODEBLOCKS>
     <LINUX_MAKE targetFolder="Builds/Linux" juceFolder="..\juce\modules">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/" isDebug="1" optimisation="1"
@@ -86,5 +96,5 @@
       </CONFIGURATIONS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
-  <JUCEOPTIONS/>
+  <JUCEOPTIONS JUCE_WEB_BROWSER="disabled"/>
 </JUCERPROJECT>

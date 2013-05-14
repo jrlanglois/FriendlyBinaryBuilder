@@ -5,22 +5,20 @@ ifndef CONFIG
   CONFIG=Debug
 endif
 
-ifeq ($(TARGET_ARCH),)
-  TARGET_ARCH := -march=native
-endif
-
-# (this disables dependency generation if multiple architectures are set)
-DEPFLAGS := $(if $(word 2, $(TARGET_ARCH)), , -MMD)
-
 ifeq ($(CONFIG),Debug)
   BINDIR := build
   LIBDIR := build
   OBJDIR := build/intermediate/Debug
   OUTDIR := build
+
+  ifeq ($(TARGET_ARCH),)
+    TARGET_ARCH := -march=native
+  endif
+
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -g -ggdb -O0
   CXXFLAGS += $(CFLAGS) 
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt 
+  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt 
   LDDEPS :=
   RESFLAGS :=  -D "LINUX=1" -D "DEBUG=1" -D "_DEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode
   TARGET := FriendlyBinaryBuilder
@@ -32,22 +30,31 @@ ifeq ($(CONFIG),Release)
   LIBDIR := build
   OBJDIR := build/intermediate/Release
   OUTDIR := build
+
+  ifeq ($(TARGET_ARCH),)
+    TARGET_ARCH := -march=native
+  endif
+
   CPPFLAGS := $(DEPFLAGS) -D "LINUX=1" -D "NDEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode
   CFLAGS += $(CPPFLAGS) $(TARGET_ARCH) -Os
   CXXFLAGS += $(CFLAGS) 
-  LDFLAGS += -L$(BINDIR) -L$(LIBDIR) -L/usr/X11R6/lib/ -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt 
+  LDFLAGS += $(TARGET_ARCH) -L$(BINDIR) -L$(LIBDIR) -fvisibility=hidden -L/usr/X11R6/lib/ -lX11 -lXext -lXinerama -ldl -lfreetype -lpthread -lrt 
   LDDEPS :=
   RESFLAGS :=  -D "LINUX=1" -D "NDEBUG=1" -D "JUCER_LINUX_MAKE_7346DA2A=1" -I /usr/include -I /usr/include/freetype2 -I ../../JuceLibraryCode
   TARGET := FriendlyBinaryBuilder
   BLDCMD = $(CXX) -o $(OUTDIR)/$(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 endif
 
+# (this disables dependency generation if multiple architectures are set)
+DEPFLAGS := $(if $(word 2, $(TARGET_ARCH)), , -MMD)
+
 OBJECTS := \
+  $(OBJDIR)/Main_90ebc5c2.o \
   $(OBJDIR)/MainComponent_a6ffb4a5.o \
   $(OBJDIR)/MainWindow_499ac812.o \
   $(OBJDIR)/BinaryBuilder_d190cabb.o \
+  $(OBJDIR)/CustomLookAndFeel_ab3d772e.o \
   $(OBJDIR)/FileListComponent_a78de1c4.o \
-  $(OBJDIR)/Main_90ebc5c2.o \
   $(OBJDIR)/juce_core_5f5a3bad.o \
   $(OBJDIR)/juce_cryptography_55e5c007.o \
   $(OBJDIR)/juce_data_structures_7e517fa9.o \
@@ -75,6 +82,11 @@ strip:
 	@echo Stripping FriendlyBinaryBuilder
 	-@strip --strip-unneeded $(OUTDIR)/$(TARGET)
 
+$(OBJDIR)/Main_90ebc5c2.o: ../../Source/Main.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling Main.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/MainComponent_a6ffb4a5.o: ../../Source/MainComponent.cpp
 	-@mkdir -p $(OBJDIR)
 	@echo "Compiling MainComponent.cpp"
@@ -90,14 +102,14 @@ $(OBJDIR)/BinaryBuilder_d190cabb.o: ../../Source/BinaryBuilder.cpp
 	@echo "Compiling BinaryBuilder.cpp"
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
+$(OBJDIR)/CustomLookAndFeel_ab3d772e.o: ../../Source/CustomLookAndFeel.cpp
+	-@mkdir -p $(OBJDIR)
+	@echo "Compiling CustomLookAndFeel.cpp"
+	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
 $(OBJDIR)/FileListComponent_a78de1c4.o: ../../Source/FileListComponent.cpp
 	-@mkdir -p $(OBJDIR)
 	@echo "Compiling FileListComponent.cpp"
-	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-
-$(OBJDIR)/Main_90ebc5c2.o: ../../Source/Main.cpp
-	-@mkdir -p $(OBJDIR)
-	@echo "Compiling Main.cpp"
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
 $(OBJDIR)/juce_core_5f5a3bad.o: ../../../juce/modules/juce_core/juce_core.cpp
