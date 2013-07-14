@@ -129,9 +129,7 @@ void MainComponent::buttonClicked (juce::Button* button)
         juce::FileChooser chooser ("Select a new folder");
         
         if (chooser.browseForDirectory())
-        {
             destDirectory.setText (chooser.getResult().getFullPathName(), juce::sendNotification);
-        }
     }
     else if (button == &generate)
     {

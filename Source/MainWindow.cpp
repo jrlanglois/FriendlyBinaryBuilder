@@ -30,7 +30,7 @@
 #include "MainWindow.h"
 
 MainWindow::MainWindow() :
-    juce::DocumentWindow ("Binary Builder",
+    juce::DocumentWindow ("Friendly Binary Builder",
                           juce::Colours::darkgrey,
                           juce::DocumentWindow::closeButton)
 {

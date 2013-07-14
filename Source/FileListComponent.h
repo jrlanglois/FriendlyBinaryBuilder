@@ -37,18 +37,14 @@ class FileListComponent : public juce::ListBoxModel,
                           public juce::FileDragAndDropTarget
 {
 public:
-    /**
-    * Constructor
-    */
+    /** Constructor */
     FileListComponent();
 
-    /**
-    * Destructor
-    */
+    /** Destructor */
     ~FileListComponent();
 
     //==============================================================================
-    juce::Array<juce::File> getFiles() const noexcept;
+    const juce::Array<juce::File>& getFiles() const noexcept { return files; }
 
     //==============================================================================
     /** @internal */

@@ -35,14 +35,10 @@
 class MainWindow : public juce::DocumentWindow
 {
 public:
-    /**
-    * Constructor
-    */
+    /** Constructor */
     MainWindow();
 
-    /**
-    * Destructor
-    */
+    /** Destructor */
     ~MainWindow();
 
     //==============================================================================

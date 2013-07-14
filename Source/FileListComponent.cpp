@@ -44,18 +44,12 @@ FileListComponent::~FileListComponent()
 }
 
 //==============================================================================
-juce::Array<juce::File> FileListComponent::getFiles() const noexcept
-{
-    return files;
-}
-
-//==============================================================================
 bool FileListComponent::isInterestedInFileDrag (const juce::StringArray& /*files*/)
 {
     return true;
 }
 
-void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, int /*x*/, int /*y*/)
+void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, const int /*x*/, const int /*y*/)
 {
     //Add valid files:
     for (int i = 0; i < incomingFiles.size(); ++i)
@@ -63,13 +57,9 @@ void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, in
         const juce::File file (incomingFiles[i]);
 
         if (file.isDirectory())
-        {
-            addRecursively (file);            
-        }
+            addRecursively (file);
         else
-        {
             addFileIfValid (file);
-        }
     }
 
     //Update the table:
@@ -78,7 +68,7 @@ void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, in
     setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.5f));
 }
 
-void FileListComponent::fileDragEnter (const juce::StringArray& /*files*/, int /*x*/, int /*y*/)
+void FileListComponent::fileDragEnter (const juce::StringArray& /*files*/, const int /*x*/, const int /*y*/)
 {
     setColour (juce::ListBox::outlineColourId, juce::Colours::red.withAlpha (0.5f));
 }
@@ -94,7 +84,8 @@ int FileListComponent::getNumRows()
     return files.size();
 }
 
-void FileListComponent::paintListBoxItem (int rowNumber, juce::Graphics& g, int width, int height, bool isRowSelected)
+void FileListComponent::paintListBoxItem (const int rowNumber, juce::Graphics& g,
+                                          const int width, const int height, const bool isRowSelected)
 {
     const juce::Colour textColour (ListBox::findColour (juce::ListBox::textColourId));
 
@@ -110,7 +101,7 @@ void FileListComponent::paintListBoxItem (int rowNumber, juce::Graphics& g, int 
 
     g.setFont (height * 0.7f);
 
-    g.drawText (files[rowNumber].getFullPathName(),
+    g.drawText (files.getReference (rowNumber).getFullPathName(),
                 5, 0, width, height,
                 juce::Justification::centredLeft, false);
 }
@@ -120,25 +111,23 @@ void FileListComponent::backgroundClicked()
     setSelectedRows (juce::SparseSet<int>());
 }
 
-void FileListComponent::deleteKeyPressed (int /*lastRowSelected*/)
+void FileListComponent::deleteKeyPressed (const int /*lastRowSelected*/)
 {
     juce::SparseSet<int> selectedRows (getSelectedRows());
 
-    for (int i = 0; i < selectedRows.size(); ++i)
-    {
+    for (int i = selectedRows.size(); --i >= 0;)
         files.remove (selectedRows[i]);
-    }
 
     updateContent();
 }
 
-void FileListComponent::listBoxItemClicked (int row, const juce::MouseEvent& e)
+void FileListComponent::listBoxItemClicked (const int row, const juce::MouseEvent& e)
 {
     if (e.mods.isRightButtonDown())
     {
         enum Options
         {
-            Remove          = 1,
+            Remove = 1,
             ShowInFolder
         };
 
@@ -154,7 +143,10 @@ void FileListComponent::listBoxItemClicked (int row, const juce::MouseEvent& e)
             break;
 
             case ShowInFolder:
-                files[row].revealToUser();
+                files.getReference (row).revealToUser();
+            break;
+
+            default:
             break;
         }
     }
@@ -164,17 +156,14 @@ void FileListComponent::listBoxItemClicked (int row, const juce::MouseEvent& e)
 bool FileListComponent::isSourceControlFile (const juce::File& file) const
 {
     return file.getFileName().endsWithIgnoreCase (".scc")
-        || file.getFileName() == ".svn"
-        || file.getFileName() == ".gitignore";
+           || file.getFileName() == ".svn"
+           || file.getFileName() == ".gitignore";
 }
 
 void FileListComponent::addFileIfValid (const juce::File& file)
 {
-    if (! isSourceControlFile (file)
-     && file.existsAsFile())
-    {
+    if (! isSourceControlFile (file) && file.existsAsFile())
         files.addIfNotAlreadyThere (file);
-    } 
 }
 
 void FileListComponent::addRecursively (const juce::File& directory)
@@ -183,7 +172,5 @@ void FileListComponent::addRecursively (const juce::File& directory)
     directory.findChildFiles (files, juce::File::findFilesAndDirectories, true);
 
     for (int i = 0; i < files.size(); ++i)
-    {
-        addFileIfValid (files[i]);
-    }
+        addFileIfValid (files.getReference (i));
 }

@@ -59,7 +59,7 @@ void BinaryBuilder::addFile (const juce::File& file)
 void BinaryBuilder::addFiles (const juce::Array<juce::File>& newFiles)
 {
     for (int i = 0; i < newFiles.size(); ++i)
-        addFile (newFiles[i]);
+        addFile (newFiles.getReference (i));
 }
 
 void BinaryBuilder::clear()
@@ -102,13 +102,12 @@ void BinaryBuilder::removeNonexistentFiles()
 {
     juce::StringArray removedFilePaths;
 
-    for (int i = 0; i < files.size(); ++i)
+    for (int i = files.size(); --i >= 0;)
     {
-        if (! files[i].existsAsFile())
+        if (! files.getReference (i).existsAsFile())
         {
-            removedFilePaths.add (files[i].getFullPathName());
+            removedFilePaths.add (files.getReference (i).getFullPathName());
             files.remove (i);
-            --i;
         }
     }
 
@@ -192,10 +191,10 @@ void BinaryBuilder::setupHeader (const juce::String& className,
     headerStream << "#ifndef " << className.toUpperCase() << "_H\r\n"
                     "#define " << className.toUpperCase() << "_H\r\n\r\n"
                     "/**\r\n"
-                    "* @file " << className << ".h\r\n"
-                    "* @date " << juce::Time::getCurrentTime().toString (true, true, true, true) << "\r\n"
-                    "*\r\n"
-                    "* Automatically generated binary data\r\n"
+                    "    @file " << className << ".h\r\n"
+                    "    @date " << juce::Time::getCurrentTime().toString (true, true, true, true) << "\r\n"
+                    "    \r\n"
+                    "    Automatically generated binary data\r\n"
                     "*/\r\n"
                     "namespace " << className << "\r\n"
                     "{\r\n";
@@ -207,7 +206,7 @@ void BinaryBuilder::setupCPP (const juce::String& className,
     cppStream << "#include \"" << className << ".h\"\r\n\r\n";
 }
 
-juce::String BinaryBuilder::temporaryVariableName() noexcept
+juce::String BinaryBuilder::temporaryVariableName() const noexcept
 {
     return "internalTemp";
 }
@@ -215,36 +214,36 @@ juce::String BinaryBuilder::temporaryVariableName() noexcept
 int BinaryBuilder::createDataFromFile (const juce::File& file,
                                        const juce::String& className,
                                        juce::OutputStream& headerStream,
-                                       juce::OutputStream& cppStream)
+                                       juce::OutputStream& cppStream,
+                                       const bool writeVarSpacing)
 {
     juce::MemoryBlock mb;
     file.loadFileAsData (mb);
 
-    const juce::String chars = "abcdefghijklmnopqrstuvwxyz";
+    static const juce::String tempVarName (temporaryVariableName());
+    const juce::String chars ("abcdefghijklmnopqrstuvwxyz");
     const juce::String name (file.getFileName()
                              .replaceCharacter (' ', '_')
                              .replaceCharacter ('.', '_')
                              .retainCharacters ("_0123456789" + chars.toLowerCase() + chars.toUpperCase()));
 
     headerStream << "    extern const char*  " << name << ";\r\n"
-                    "    const int           " << name << "Size = "
-                 << (int) mb.getSize() << ";\r\n\r\n";
+                    "    const int           " << name << "Size = " << (int) mb.getSize() << ";\r\n";
 
-    cppStream << "static const unsigned char " << temporaryVariableName() << ++tempNumber << "[] = \r\n{\r\n    ";
+    if (writeVarSpacing)
+        headerStream << "\r\n";
+
+    cppStream << "static const unsigned char " << tempVarName << ++tempNumber << "[] = \r\n{\r\n    ";
 
     size_t i = 0;
     const juce::uint8* const data = (const juce::uint8*) mb.getData();
 
     while (i < (mb.getSize() - 1))
     {
-        if ((i % 30) != 29)
-        {
-            cppStream << (int) data[i] << ",";
-        }
-        else
-        {
-            cppStream << (int) data[i] << ",\r\n    ";
-        }
+        cppStream << (int) data[i] << ",";
+
+        if ((i % 30) == 29)
+            cppStream << "\r\n    ";
 
         ++i;
     }
@@ -252,8 +251,10 @@ int BinaryBuilder::createDataFromFile (const juce::File& file,
     cppStream << (int) data[i] << ",0,0" << "\r\n};\r\n\r\n";
 
     cppStream << "const char* " << className << "::" << name
-              << " = (const char*) " << temporaryVariableName() << tempNumber << ";\r\n\r\n"
-              << "//==============================================================================";
+              << " = (const char*) " << temporaryVariableName() << tempNumber << ";";
+
+    if (writeVarSpacing)
+        cppStream << "\r\n\r\n//==============================================================================";
 
     return mb.getSize();
 }
@@ -283,10 +284,10 @@ void BinaryBuilder::generateBinaries (const juce::String& className)
 
             tempNumber = 0;
 
-            for (int i = 0; i < files.size(); ++i)
-            {
-                createDataFromFile (files[i], className, *header, *cpp);
-            }
+            const int numFiles = files.size();
+
+            for (int i = 0; i < numFiles; ++i)
+                createDataFromFile (files.getReference (i), className, *header, *cpp, i != (numFiles - 1));
 
             *header << "}\r\n\r\n"
                        "#endif //" << className.toUpperCase() << "_H";

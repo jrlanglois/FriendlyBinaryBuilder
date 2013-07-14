@@ -33,30 +33,23 @@
 #include "JuceHeader.h"
 
 /**
-* @file BinaryBuilder.h
-*
-* Simple class used to generate header and cpp files containing binary
-* data based off of the added files. The generated files will be placed
-* in the set destination directory.
-*
-* @authors Joël R. Langlois, Julian Storer (credited for original code)
+    @file BinaryBuilder.h
+    @authors Joël R. Langlois, Julian Storer (credited for original code)
+
+    Simple class used to generate header and cpp files containing binary
+    data based off of the added files. The generated files will be placed
+    in the set destination directory.
 */
 class BinaryBuilder
 {
 public:
-    /**
-    * Constructor
-    */
+    /** Constructor */
     BinaryBuilder();
 
-    /**
-    * Constructor
-    */
+    /** Constructor */
     BinaryBuilder (const juce::File& destinationDirectory);
 
-    /**
-    * Destructor
-    */
+    /** Destructor */
     ~BinaryBuilder() noexcept;
 
     //==============================================================================
@@ -92,7 +85,7 @@ private:
     bool hasValidDestinationDirectory();
 
     //==============================================================================
-    static juce::String temporaryVariableName() noexcept;
+    juce::String temporaryVariableName() const noexcept;
 
     void setupHeader (const juce::String& className,
                       juce::OutputStream& headerStream);
@@ -103,7 +96,8 @@ private:
     int createDataFromFile (const juce::File& file,
                             const juce::String& className,
                             juce::OutputStream& headerStream,
-                            juce::OutputStream& cppStream);
+                            juce::OutputStream& cppStream,
+                            bool writeVarSpacing);
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BinaryBuilder);
