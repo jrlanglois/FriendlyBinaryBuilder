@@ -58,6 +58,7 @@ private:
     FileListComponent currentFiles;
     juce::Label className;
     juce::ToggleButton alwaysUseUnsigned;
+    juce::ToggleButton zipDataStreams;
     juce::TextEditor destDirectory;
     juce::TextEditor classNameEditor;
     juce::TextButton destDirSelector;

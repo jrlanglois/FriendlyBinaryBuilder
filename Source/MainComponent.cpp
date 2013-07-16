@@ -57,6 +57,9 @@ MainComponent::MainComponent()
     alwaysUseUnsigned.setColour (juce::ToggleButton::textColourId, juce::Colours::white);
     alwaysUseUnsigned.setButtonText ("Always use unsigned for arrays");
 
+    zipDataStreams.setColour (juce::ToggleButton::textColourId, juce::Colours::white);
+    zipDataStreams.setButtonText ("Zip data (uses JUCE/ZLib)");
+
     generate.setColour (juce::TextButton::buttonColourId, buttonColour);
     generate.setColour (juce::TextButton::buttonOnColourId, buttonColour.brighter (0.75f));
     generate.setColour (juce::TextButton::textColourOffId, juce::Colours::black);
@@ -70,6 +73,7 @@ MainComponent::MainComponent()
     addAndMakeVisible (&className);
     addAndMakeVisible (&classNameEditor);
     addAndMakeVisible (&alwaysUseUnsigned);
+    addAndMakeVisible (&zipDataStreams);
     addAndMakeVisible (&generate);
 }
 
@@ -119,6 +123,8 @@ void MainComponent::resized()
     alwaysUseUnsigned.setBounds (borderThickness, className.getBottom() + borderThickness,
                                  200, normalCompHeight);
 
+    zipDataStreams.setBounds (alwaysUseUnsigned.getBounds().withX (alwaysUseUnsigned.getRight()));
+
     generate.setSize (normalCompWidth, normalCompHeight);
     generate.setTopRightPosition (getWidth() - borderThickness, alwaysUseUnsigned.getY());
 }
@@ -137,6 +143,9 @@ void MainComponent::buttonClicked (juce::Button* button)
         binaryBuilder.clear();
         binaryBuilder.setDestinationDirectory (destDirectory.getText().trim());
         binaryBuilder.addFiles (currentFiles.getFiles());
-        binaryBuilder.generateBinaries (alwaysUseUnsigned.getToggleState(), classNameEditor.getText().trim());
+
+        binaryBuilder.generateBinaries (alwaysUseUnsigned.getToggleState(),
+                                        zipDataStreams.getToggleState(),
+                                        classNameEditor.getText().trim());
     }
 }

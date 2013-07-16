@@ -62,7 +62,9 @@ public:
     void setDestinationDirectory (const juce::File& destinationDirectory);
 
     //==============================================================================
-    void generateBinaries (bool alwaysUseUnsigned, const juce::String& className = BinaryBuilder::defaultClassName);
+    void generateBinaries (bool alwaysUseUnsigned,
+                           bool zipDataStreams,
+                           const juce::String& className = BinaryBuilder::defaultClassName);
 
     //==============================================================================
     static const juce::String defaultClassName;
@@ -71,6 +73,7 @@ private:
     //==============================================================================
     juce::File destinationDirectory;
     bool alwaysUseUnsigned;
+    bool zipAllDataStreams;
     juce::Array<juce::File> files;
     int tempNumber;
 

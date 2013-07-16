@@ -34,12 +34,14 @@ const juce::String BinaryBuilder::defaultClassName = "BinaryData";
 
 //==============================================================================
 BinaryBuilder::BinaryBuilder() :
-    alwaysUseUnsigned (false)
+    alwaysUseUnsigned (false),
+    zipAllDataStreams (false)
 {
 }
 
 BinaryBuilder::BinaryBuilder (const juce::File& destDir) :
-    alwaysUseUnsigned (false)
+    alwaysUseUnsigned (false),
+    zipAllDataStreams (false)
 {
     setDestinationDirectory (destDir);
 }
@@ -240,6 +242,15 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
     if (! file.loadFileAsData (mb))
         return false;
 
+    if (zipAllDataStreams)
+    {
+        juce::MemoryOutputStream memStream;
+        juce::GZIPCompressorOutputStream zipper (&memStream, 9);
+        zipper.write (mb.getData(), mb.getSize());
+        zipper.flush();
+        mb = memStream.getMemoryBlock();
+    }
+
     const size_t size = mb.getSize();
 
     const juce::String tempVarName (temporaryVariableName() + juce::String (++tempNumber));
@@ -284,13 +295,16 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
 }
 
 //==============================================================================
-void BinaryBuilder::generateBinaries (const bool useUnsigned, const juce::String& className)
+void BinaryBuilder::generateBinaries (const bool useUnsigned, const bool zipDataStreams,
+                                      const juce::String& className)
 {
     const juce::String validClassName (createValidVersionOfClassName (className));
 
     if (hasValidDestinationDirectory() && hasValidFiles())
     {
         alwaysUseUnsigned = useUnsigned;
+        zipAllDataStreams = zipDataStreams;
+
         const juce::File headerFile (destinationDirectory.getChildFile (className).withFileExtension (".h"));
         const juce::File cppFile (destinationDirectory.getChildFile (className).withFileExtension (".cpp"));
 
