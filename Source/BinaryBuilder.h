@@ -68,6 +68,7 @@ public:
 private:
     //==============================================================================
     juce::File destinationDirectory;
+    bool alwaysUseUnsigned;
     juce::Array<juce::File> files;
     int tempNumber;
 
@@ -87,17 +88,24 @@ private:
     //==============================================================================
     juce::String temporaryVariableName() const noexcept;
 
+    juce::String externValueType() const noexcept;
+
+    juce::String internalValueType() const noexcept;
+
+    //==============================================================================
     void setupHeader (const juce::String& className,
                       juce::OutputStream& headerStream);
 
     void setupCPP (const juce::String& className,
                    juce::OutputStream& cppStream);
 
-    int createDataFromFile (const juce::File& file,
-                            const juce::String& className,
-                            juce::OutputStream& headerStream,
-                            juce::OutputStream& cppStream,
-                            bool writeVarSpacing);
+    bool createDataFromFile (const juce::File& file,
+                             const juce::String& className,
+                             juce::OutputStream& headerStream,
+                             juce::OutputStream& cppStream,
+                             bool writeVarSpacing);
+
+    void tryShowInvalidFileList (const juce::Array<juce::File>& invalidFiles);
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BinaryBuilder);

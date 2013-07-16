@@ -33,11 +33,13 @@
 const juce::String BinaryBuilder::defaultClassName = "BinaryData";
 
 //==============================================================================
-BinaryBuilder::BinaryBuilder()
+BinaryBuilder::BinaryBuilder() :
+    alwaysUseUnsigned (false)
 {
 }
 
-BinaryBuilder::BinaryBuilder (const juce::File& destDir)
+BinaryBuilder::BinaryBuilder (const juce::File& destDir) :
+    alwaysUseUnsigned (false)
 {
     setDestinationDirectory (destDir);
 }
@@ -90,7 +92,7 @@ juce::String BinaryBuilder::createValidVersionOfClassName (const juce::String& c
         juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
                                            "No class name!",
                                            "You've not set a class name!\n\nWill use the default one: " + defaultClassName,
-                                           "OK"); //"OK" because I personally dislike "ok" (it just feels wrong...)
+                                           "OK");
 
         return defaultClassName;
     }
@@ -185,8 +187,29 @@ bool BinaryBuilder::hasValidDestinationDirectory()
 }
 
 //==============================================================================
-void BinaryBuilder::setupHeader (const juce::String& className,
-                                 juce::OutputStream& headerStream)
+juce::String BinaryBuilder::temporaryVariableName() const noexcept
+{
+    return "internalTemp";
+}
+
+juce::String BinaryBuilder::externValueType() const noexcept
+{
+    if (alwaysUseUnsigned)
+        return "const unsigned char*";
+
+    return "const char*"; 
+}
+
+juce::String BinaryBuilder::internalValueType() const noexcept
+{
+    if (alwaysUseUnsigned)
+        return "const unsigned char*";
+
+    return "const char*"; 
+}
+
+//==============================================================================
+void BinaryBuilder::setupHeader (const juce::String& className, juce::OutputStream& headerStream)
 {
     headerStream << "#ifndef " << className.toUpperCase() << "_H\r\n"
                     "#define " << className.toUpperCase() << "_H\r\n\r\n"
@@ -200,25 +223,23 @@ void BinaryBuilder::setupHeader (const juce::String& className,
                     "{\r\n";
 }
 
-void BinaryBuilder::setupCPP (const juce::String& className,
-                              juce::OutputStream& cppStream)
+void BinaryBuilder::setupCPP (const juce::String& className, juce::OutputStream& cppStream)
 {
     cppStream << "#include \"" << className << ".h\"\r\n\r\n";
 }
 
-juce::String BinaryBuilder::temporaryVariableName() const noexcept
-{
-    return "internalTemp";
-}
-
-int BinaryBuilder::createDataFromFile (const juce::File& file,
-                                       const juce::String& className,
-                                       juce::OutputStream& headerStream,
-                                       juce::OutputStream& cppStream,
-                                       const bool writeVarSpacing)
+bool BinaryBuilder::createDataFromFile (const juce::File& file,
+                                        const juce::String& className,
+                                        juce::OutputStream& headerStream,
+                                        juce::OutputStream& cppStream,
+                                        const bool writeVarSpacing)
 {
     juce::MemoryBlock mb;
-    file.loadFileAsData (mb);
+
+    if (! file.loadFileAsData (mb))
+        return false;
+
+    const size_t size = juce::jmax (mb.getSize(), (size_t) std::numeric_limits<size_t>::max());
 
     static const juce::String tempVarName (temporaryVariableName());
     const juce::String chars ("abcdefghijklmnopqrstuvwxyz");
@@ -227,18 +248,18 @@ int BinaryBuilder::createDataFromFile (const juce::File& file,
                              .replaceCharacter ('.', '_')
                              .retainCharacters ("_0123456789" + chars.toLowerCase() + chars.toUpperCase()));
 
-    headerStream << "    extern const char*  " << name << ";\r\n"
-                    "    const int           " << name << "Size = " << (int) mb.getSize() << ";\r\n";
+    headerStream << "    " << externValueType() << " " << name << ";\r\n";
+    headerStream << "    const int           " << name << "Size = " << juce::String (size) << ";\r\n";
 
     if (writeVarSpacing)
         headerStream << "\r\n";
 
-    cppStream << "static const unsigned char " << tempVarName << ++tempNumber << "[] = \r\n{\r\n    ";
+    cppStream << "static extern " << internalValueType() << " " << tempVarName << ++tempNumber << "[] = \r\n{\r\n    ";
 
     size_t i = 0;
     const juce::uint8* const data = (const juce::uint8*) mb.getData();
 
-    while (i < (mb.getSize() - 1))
+    while (i < (size - 1))
     {
         cppStream << (int) data[i] << ",";
 
@@ -250,13 +271,13 @@ int BinaryBuilder::createDataFromFile (const juce::File& file,
 
     cppStream << (int) data[i] << ",0,0" << "\r\n};\r\n\r\n";
 
-    cppStream << "const char* " << className << "::" << name
-              << " = (const char*) " << temporaryVariableName() << tempNumber << ";";
+    cppStream << internalValueType() << " " << className << "::" << name;
+    cppStream << " = (" << internalValueType() << ") " << temporaryVariableName() << tempNumber << ";";
 
     if (writeVarSpacing)
         cppStream << "\r\n\r\n//==============================================================================";
 
-    return mb.getSize();
+    return true;
 }
 
 void BinaryBuilder::generateBinaries (const juce::String& className)
@@ -286,13 +307,35 @@ void BinaryBuilder::generateBinaries (const juce::String& className)
 
             const int numFiles = files.size();
 
+            juce::Array<juce::File> invalidFiles;
+
             for (int i = 0; i < numFiles; ++i)
-                createDataFromFile (files.getReference (i), className, *header, *cpp, i != (numFiles - 1));
+                if (! createDataFromFile (files.getReference (i), className, *header, *cpp, i != (numFiles - 1)))
+                    invalidFiles.addIfNotAlreadyThere (files.getReference (i));
 
             *header << "}\r\n\r\n"
                        "#endif //" << className.toUpperCase() << "_H";
 
             header = cpp = nullptr;
+
+            tryShowInvalidFileList (invalidFiles);
         }
+    }
+}
+
+void BinaryBuilder::tryShowInvalidFileList (const juce::Array<juce::File>& invalidFiles)
+{
+    if (invalidFiles.size() > 0)
+    {
+        juce::String fileList ("The files listed below were not added.");
+        fileList += juce::newLine + "It's possible they were too large to write as binary.";
+
+        for (int i = 0; i < invalidFiles.size(); ++i)
+            fileList += invalidFiles.getReference (i).getFullPathName() + juce::newLine;
+
+        juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
+                                           "Some files weren't added!",
+                                           fileList,
+                                           "OK");
     }
 }

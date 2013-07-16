@@ -46,7 +46,7 @@ FileListComponent::~FileListComponent()
 //==============================================================================
 bool FileListComponent::isInterestedInFileDrag (const juce::StringArray& /*files*/)
 {
-    return true;
+    return true; //Accept all files. Any invalid ones will be filtered later...
 }
 
 void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, const int /*x*/, const int /*y*/)
