@@ -54,13 +54,15 @@ public:
 
     //==============================================================================
     void addFile (const juce::File& file);
+
     void addFiles (const juce::Array<juce::File>& files);
+
     void clear();
 
     void setDestinationDirectory (const juce::File& destinationDirectory);
 
     //==============================================================================
-    void generateBinaries (const juce::String& className = BinaryBuilder::defaultClassName);
+    void generateBinaries (bool alwaysUseUnsigned, const juce::String& className = BinaryBuilder::defaultClassName);
 
     //==============================================================================
     static const juce::String defaultClassName;

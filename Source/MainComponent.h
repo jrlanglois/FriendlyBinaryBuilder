@@ -56,9 +56,9 @@ private:
     BinaryBuilder binaryBuilder;
 
     FileListComponent currentFiles;
-    juce::Label destDirectory;
     juce::Label className;
     juce::ToggleButton alwaysUseUnsigned;
+    juce::TextEditor destDirectory;
     juce::TextEditor classNameEditor;
     juce::TextButton destDirSelector;
     juce::TextButton generate;

@@ -42,11 +42,7 @@ MainComponent::MainComponent()
     destDirSelector.setButtonText ("Change directory...");
     destDirSelector.addListener (this);
 
-    destDirectory.setColour (juce::Label::textColourId, juce::Colours::white);
-    destDirectory.setColour (juce::Label::outlineColourId, juce::Colours::lightgrey);
-    destDirectory.setColour (juce::Label::backgroundColourId, juce::Colours::darkgrey);
-    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName(), juce::dontSendNotification);
-    destDirectory.setEditable (false, true, false);
+    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName(), false);
 
     className.setText ("Class name:", juce::dontSendNotification);
     className.setJustificationType (juce::Justification::centredRight);
@@ -59,7 +55,7 @@ MainComponent::MainComponent()
     }
 
     alwaysUseUnsigned.setColour (juce::ToggleButton::textColourId, juce::Colours::white);
-    alwaysUseUnsigned.setButtonText ("Use unsigned");
+    alwaysUseUnsigned.setButtonText ("Always use unsigned for arrays");
 
     generate.setColour (juce::TextButton::buttonColourId, buttonColour);
     generate.setColour (juce::TextButton::buttonOnColourId, buttonColour.brighter (0.75f));
@@ -121,7 +117,7 @@ void MainComponent::resized()
     }
 
     alwaysUseUnsigned.setBounds (borderThickness, className.getBottom() + borderThickness,
-                                 normalCompWidth, normalCompHeight);
+                                 200, normalCompHeight);
 
     generate.setSize (normalCompWidth, normalCompHeight);
     generate.setTopRightPosition (getWidth() - borderThickness, alwaysUseUnsigned.getY());
@@ -132,17 +128,15 @@ void MainComponent::buttonClicked (juce::Button* button)
     if (button == &destDirSelector)
     {
         juce::FileChooser chooser ("Select a new folder");
-        
+
         if (chooser.browseForDirectory())
-            destDirectory.setText (chooser.getResult().getFullPathName(), juce::sendNotification);
+            destDirectory.setText (chooser.getResult().getFullPathName(), true);
     }
     else if (button == &generate)
     {
-        binaryBuilder.setDestinationDirectory (destDirectory.getText().trim());
-
         binaryBuilder.clear();
+        binaryBuilder.setDestinationDirectory (destDirectory.getText().trim());
         binaryBuilder.addFiles (currentFiles.getFiles());
-
-        binaryBuilder.generateBinaries (classNameEditor.getText().trim());
+        binaryBuilder.generateBinaries (alwaysUseUnsigned.getToggleState(), classNameEditor.getText().trim());
     }
 }

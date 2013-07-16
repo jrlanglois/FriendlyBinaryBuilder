@@ -239,7 +239,7 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
     if (! file.loadFileAsData (mb))
         return false;
 
-    const size_t size = juce::jmax (mb.getSize(), (size_t) std::numeric_limits<size_t>::max());
+    const size_t size = mb.getSize();
 
     static const juce::String tempVarName (temporaryVariableName());
     const juce::String chars ("abcdefghijklmnopqrstuvwxyz");
@@ -248,17 +248,17 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
                              .replaceCharacter ('.', '_')
                              .retainCharacters ("_0123456789" + chars.toLowerCase() + chars.toUpperCase()));
 
-    headerStream << "    " << externValueType() << " " << name << ";\r\n";
-    headerStream << "    const int           " << name << "Size = " << juce::String (size) << ";\r\n";
+    headerStream << "    extern " << externValueType() << " " << name << ";\r\n";
+    headerStream << "    const int          " << name << "Size = " << juce::String (size) << ";\r\n";
 
     if (writeVarSpacing)
         headerStream << "\r\n";
 
-    cppStream << "static extern " << internalValueType() << " " << tempVarName << ++tempNumber << "[] = \r\n{\r\n    ";
+    cppStream << "static " << internalValueType() << " " << tempVarName << ++tempNumber << "[] = \r\n{\r\n    ";
 
-    size_t i = 0;
     const juce::uint8* const data = (const juce::uint8*) mb.getData();
 
+    size_t i = 0;
     while (i < (size - 1))
     {
         cppStream << (int) data[i] << ",";
@@ -272,7 +272,7 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
     cppStream << (int) data[i] << ",0,0" << "\r\n};\r\n\r\n";
 
     cppStream << internalValueType() << " " << className << "::" << name;
-    cppStream << " = (" << internalValueType() << ") " << temporaryVariableName() << tempNumber << ";";
+    cppStream << " = " << temporaryVariableName() << tempNumber << ";";
 
     if (writeVarSpacing)
         cppStream << "\r\n\r\n//==============================================================================";
@@ -280,12 +280,13 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
     return true;
 }
 
-void BinaryBuilder::generateBinaries (const juce::String& className)
+void BinaryBuilder::generateBinaries (const bool useUnsigned, const juce::String& className)
 {
     const juce::String validClassName (createValidVersionOfClassName (className));
 
     if (hasValidDestinationDirectory() && hasValidFiles())
     {
+        alwaysUseUnsigned = useUnsigned;
         const juce::File headerFile (destinationDirectory.getChildFile (className).withFileExtension (".h"));
         const juce::File cppFile (destinationDirectory.getChildFile (className).withFileExtension (".cpp"));
 

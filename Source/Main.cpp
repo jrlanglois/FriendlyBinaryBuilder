@@ -30,6 +30,14 @@
 #include "MainWindow.h"
 #include "CustomLookAndFeel.h"
 
+#ifdef JUCE_WINDOWS
+    #ifdef JUCE_MSVC
+        #ifdef JUCE_VC8_OR_EARLIER
+            #error "Message from Joël: Please use the latest Visual Studio possible. The Express version is free!"
+        #endif
+    #endif
+#endif
+
 class FriendlyBinaryBuilderApplication : public juce::JUCEApplication
 {
 public:
