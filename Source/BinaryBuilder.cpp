@@ -228,6 +228,7 @@ void BinaryBuilder::setupCPP (const juce::String& className, juce::OutputStream&
     cppStream << "#include \"" << className << ".h\"\r\n\r\n";
 }
 
+//==============================================================================
 bool BinaryBuilder::createDataFromFile (const juce::File& file,
                                         const juce::String& className,
                                         juce::OutputStream& headerStream,
@@ -241,20 +242,22 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
 
     const size_t size = mb.getSize();
 
-    static const juce::String tempVarName (temporaryVariableName());
+    const juce::String tempVarName (temporaryVariableName() + juce::String (++tempNumber));
     const juce::String chars ("abcdefghijklmnopqrstuvwxyz");
     const juce::String name (file.getFileName()
                              .replaceCharacter (' ', '_')
                              .replaceCharacter ('.', '_')
                              .retainCharacters ("_0123456789" + chars.toLowerCase() + chars.toUpperCase()));
 
+    //Write to the Header file:
     headerStream << "    extern " << externValueType() << " " << name << ";\r\n";
     headerStream << "    const int          " << name << "Size = " << juce::String (size) << ";\r\n";
 
     if (writeVarSpacing)
         headerStream << "\r\n";
 
-    cppStream << "static " << internalValueType() << " " << tempVarName << ++tempNumber << "[] = \r\n{\r\n    ";
+    //Write to the CPP file:
+    cppStream << "static " << internalValueType() << " " << tempVarName << "[] = \r\n{\r\n    ";
 
     const juce::uint8* const data = (const juce::uint8*) mb.getData();
 
@@ -272,7 +275,7 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
     cppStream << (int) data[i] << ",0,0" << "\r\n};\r\n\r\n";
 
     cppStream << internalValueType() << " " << className << "::" << name;
-    cppStream << " = " << temporaryVariableName() << tempNumber << ";";
+    cppStream << " = " << tempVarName << ";";
 
     if (writeVarSpacing)
         cppStream << "\r\n\r\n//==============================================================================";
@@ -280,6 +283,7 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
     return true;
 }
 
+//==============================================================================
 void BinaryBuilder::generateBinaries (const bool useUnsigned, const juce::String& className)
 {
     const juce::String validClassName (createValidVersionOfClassName (className));
@@ -295,9 +299,6 @@ void BinaryBuilder::generateBinaries (const bool useUnsigned, const juce::String
 
         juce::ScopedPointer<juce::OutputStream> header (headerFile.createOutputStream());
         juce::ScopedPointer<juce::OutputStream> cpp (cppFile.createOutputStream());
-
-        jassert (header != nullptr); //File is probably in use...
-        jassert (cpp != nullptr); //File is probably in use...
 
         if (header != nullptr && cpp != nullptr)
         {
@@ -320,6 +321,13 @@ void BinaryBuilder::generateBinaries (const bool useUnsigned, const juce::String
             header = cpp = nullptr;
 
             tryShowInvalidFileList (invalidFiles);
+        }
+        else
+        {
+            juce::AlertWindow::showMessageBox (juce::AlertWindow::WarningIcon,
+                                               "The destination files are currently in use!",
+                                               "You must stop using them in order to leave FriendlyBinaryBuilder overwrite them.",
+                                               "OK");
         }
     }
 }
