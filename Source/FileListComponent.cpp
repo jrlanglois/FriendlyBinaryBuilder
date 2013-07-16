@@ -44,6 +44,13 @@ FileListComponent::~FileListComponent()
 }
 
 //==============================================================================
+void FileListComponent::clearAll()
+{
+    files.clear();
+    updateContent();
+}
+
+//==============================================================================
 bool FileListComponent::isInterestedInFileDrag (const juce::StringArray& /*files*/)
 {
     return true; //Accept all files. Any invalid ones will be filtered later...
@@ -53,14 +60,7 @@ void FileListComponent::filesDropped (const juce::StringArray& incomingFiles, co
 {
     //Add valid files:
     for (int i = 0; i < incomingFiles.size(); ++i)
-    {
-        const juce::File file (incomingFiles[i]);
-
-        if (file.isDirectory())
-            addRecursively (file);
-        else
-            addFileIfValid (file);
-    }
+        addFileIfValid (incomingFiles[i]);
 
     //Update the table:
     updateContent();
@@ -162,8 +162,15 @@ bool FileListComponent::isSourceControlFile (const juce::File& file) const
 
 void FileListComponent::addFileIfValid (const juce::File& file)
 {
-    if (! isSourceControlFile (file) && file.existsAsFile())
-        files.addIfNotAlreadyThere (file);
+    if (file.isDirectory())
+    {
+        addRecursively (file);
+    }
+    else
+    {
+        if (! isSourceControlFile (file) && file.existsAsFile())
+            files.addIfNotAlreadyThere (file);
+    }
 }
 
 void FileListComponent::addRecursively (const juce::File& directory)

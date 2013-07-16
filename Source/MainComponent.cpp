@@ -31,7 +31,7 @@
 
 MainComponent::MainComponent()
 {
-    setSize (800, 600);
+    setSize (600, 500);
 
     const juce::Colour buttonColour (juce::Colours::blue.brighter().brighter());
 
@@ -42,9 +42,13 @@ MainComponent::MainComponent()
     destDirSelector.setButtonText ("Change directory...");
     destDirSelector.addListener (this);
 
-    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName(), false);
+#ifdef JUCE_WINDOWS
+    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName() + "\\Generated Binary Files\\", false);
+#else
+    destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName() + "/Generated Binary Files/", false);
+#endif
 
-    className.setText ("Class name:", juce::dontSendNotification);
+    className.setText ("Namespace name:", juce::dontSendNotification);
     className.setJustificationType (juce::Justification::centredRight);
     className.setColour (juce::Label::textColourId, juce::Colours::white);
     classNameEditor.setText (BinaryBuilder::defaultClassName, false);
@@ -74,6 +78,7 @@ MainComponent::MainComponent()
     addAndMakeVisible (&classNameEditor);
     addAndMakeVisible (&alwaysUseUnsigned);
     addAndMakeVisible (&zipDataStreams);
+    addAndMakeVisible (&clearAll);
     addAndMakeVisible (&generate);
 }
 
@@ -137,6 +142,18 @@ void MainComponent::buttonClicked (juce::Button* button)
 
         if (chooser.browseForDirectory())
             destDirectory.setText (chooser.getResult().getFullPathName(), true);
+    }
+    else if (button == &clearAll)
+    {
+        if (currentFiles.getNumRows() > 0)
+        {
+            const int result = juce::AlertWindow::showYesNoCancelBox (juce::AlertWindow::InfoIcon,
+                                                                      "Clear the files?",
+                                                                      "Are you sure you want to clear all the listed files?",
+                                                                      "Yes", "No");
+            if (result == -1)
+                currentFiles.clearAll();
+        }
     }
     else if (button == &generate)
     {

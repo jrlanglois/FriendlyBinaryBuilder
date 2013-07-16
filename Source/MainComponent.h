@@ -54,14 +54,15 @@ public:
 private:
     //==============================================================================
     BinaryBuilder binaryBuilder;
-
     FileListComponent currentFiles;
+
     juce::Label className;
     juce::ToggleButton alwaysUseUnsigned;
     juce::ToggleButton zipDataStreams;
     juce::TextEditor destDirectory;
     juce::TextEditor classNameEditor;
     juce::TextButton destDirSelector;
+    juce::TextButton clearAll;
     juce::TextButton generate;
 
     //==============================================================================

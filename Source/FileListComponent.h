@@ -46,6 +46,8 @@ public:
     //==============================================================================
     const juce::Array<juce::File>& getFiles() const noexcept { return files; }
 
+    void clearAll();
+
     //==============================================================================
     /** @internal */
     bool isInterestedInFileDrag (const juce::StringArray& files);
