@@ -231,16 +231,16 @@ void BinaryBuilder::setupCPP (const juce::String& className, juce::OutputStream&
 }
 
 //==============================================================================
-bool BinaryBuilder::createDataFromFile (const juce::File& file,
-                                        const juce::String& className,
-                                        juce::OutputStream& headerStream,
-                                        juce::OutputStream& cppStream,
-                                        const bool writeVarSpacing)
+BinaryBuilder::CreateResult BinaryBuilder::createDataFromFile (const juce::File& file,
+                                                               const juce::String& className,
+                                                               juce::OutputStream& headerStream,
+                                                               juce::OutputStream& cppStream,
+                                                               const bool writeVarSpacing)
 {
     juce::MemoryBlock mb;
 
     if (! file.loadFileAsData (mb))
-        return false;
+        return CreateCouldntLoad;
 
     if (zipAllDataStreams)
     {
@@ -281,6 +281,9 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
             cppStream << "\r\n    ";
 
         ++i;
+
+        if (anyCountersRequestCancellation())
+            return CreateCancelled;
     }
 
     cppStream << (int) data[i] << ",0,0" << "\r\n};\r\n\r\n";
@@ -291,7 +294,7 @@ bool BinaryBuilder::createDataFromFile (const juce::File& file,
     if (writeVarSpacing)
         cppStream << "\r\n\r\n//==============================================================================";
 
-    return true;
+    return CreateOkay;
 }
 
 //==============================================================================
@@ -325,16 +328,45 @@ void BinaryBuilder::generateBinaries (const bool useUnsigned, const bool zipData
 
             juce::Array<juce::File> invalidFiles;
 
+            bool deleteFiles = false;
+
             for (int i = 0; i < numFiles; ++i)
-                if (! createDataFromFile (files.getReference (i), className, *header, *cpp, i != (numFiles - 1)))
-                    invalidFiles.addIfNotAlreadyThere (files.getReference (i));
+            {
+                const juce::File& fileToProcess = files.getReference (i);
+                const CreateResult result =  createDataFromFile (fileToProcess, className,
+                                                                 *header, *cpp, i != (numFiles - 1));
 
-            *header << "}\r\n\r\n"
-                       "#endif //" << className.toUpperCase() << "_H";
+                switch (result)
+                {
+                    case CreateCouldntLoad:
+                        invalidFiles.addIfNotAlreadyThere (fileToProcess);
+                    break;
 
+                    case CreateCancelled:
+                        deleteFiles = true;
+                    break;
+
+                    default: break;
+                };
+
+                if (deleteFiles)
+                    break;
+            }
+
+            *header << "}\r\n\r\n" << "#endif //" << className.toUpperCase() << "_H";
             header = cpp = nullptr;
 
-            tryShowInvalidFileList (invalidFiles);
+            if (deleteFiles)
+            {
+                headerFile.deleteFile();
+                cppFile.deleteFile();
+                progressCounters.call (&ProgressCounter::processCanceled);
+            }
+            else
+            {
+                tryShowInvalidFileList (invalidFiles);
+                progressCounters.call (&ProgressCounter::processCompleted);
+            }
         }
         else
         {
@@ -342,6 +374,8 @@ void BinaryBuilder::generateBinaries (const bool useUnsigned, const bool zipData
                                                "The destination files are currently in use!",
                                                "You must stop using them in order to leave FriendlyBinaryBuilder overwrite them.",
                                                "OK");
+
+            progressCounters.call (&ProgressCounter::processFailedToStart);
         }
     }
 }
@@ -361,4 +395,31 @@ void BinaryBuilder::tryShowInvalidFileList (const juce::Array<juce::File>& inval
                                            fileList,
                                            "OK");
     }
+}
+
+//==============================================================================
+void BinaryBuilder::addProgressCounter (ProgressCounter* counter)
+{
+    progressCounters.add (counter);
+}
+
+void BinaryBuilder::removeProgressCounter (ProgressCounter* counter)
+{
+    progressCounters.remove (counter);
+}
+
+bool BinaryBuilder::anyCountersRequestCancellation()
+{
+    const juce::Array<ProgressCounter*>& list = progressCounters.getListeners();
+
+    for (int i = list.size(); --i >= 0;)
+        if (list.getUnchecked (i)->requestCancellation())
+            return true;
+
+    return false;
+}
+    
+void BinaryBuilder::handleAsyncUpdate()
+{
+    progressCounters.call (&ProgressCounter::updateProgress, progress);
 }

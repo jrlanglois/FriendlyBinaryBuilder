@@ -151,6 +151,7 @@ void MainComponent::buttonClicked (juce::Button* button)
                                                                       "Clear the files?",
                                                                       "Are you sure you want to clear all the listed files?",
                                                                       "Yes", "No");
+
             if (result == -1)
                 currentFiles.clearAll();
         }

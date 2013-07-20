@@ -40,7 +40,7 @@
     data based off of the added files. The generated files will be placed
     in the set destination directory.
 */
-class BinaryBuilder
+class BinaryBuilder : private juce::AsyncUpdater
 {
 public:
     /** Constructor */
@@ -67,6 +67,33 @@ public:
                            const juce::String& className = BinaryBuilder::defaultClassName);
 
     //==============================================================================
+    class ProgressCounter
+    {
+    public:
+        ProgressCounter() noexcept { }
+        ~ProgressCounter() noexcept { }
+
+        virtual void processStarted() = 0;
+
+        virtual void processCanceled() = 0;
+
+        virtual void processCompleted() = 0;
+
+        virtual void processFailedToStart() = 0;
+
+        virtual void updateProgress (double progress) = 0;
+
+        virtual bool requestCancellation() = 0;
+
+    private:
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProgressCounter)
+    };
+
+    void addProgressCounter (ProgressCounter* counter);
+
+    void removeProgressCounter (ProgressCounter* counter);
+
+    //==============================================================================
     static const juce::String defaultClassName;
 
 private:
@@ -74,8 +101,17 @@ private:
     juce::File destinationDirectory;
     bool alwaysUseUnsigned;
     bool zipAllDataStreams;
-    juce::Array<juce::File> files;
+    bool shouldCancel;
     int tempNumber;
+    double progress;
+    juce::Array<juce::File> files;
+
+    juce::ListenerList<ProgressCounter> progressCounters;
+
+    //==============================================================================
+    bool anyCountersRequestCancellation();
+    
+    void handleAsyncUpdate();
 
     //==============================================================================
     juce::String createValidVersionOfClassName (const juce::String& className) const;
@@ -104,11 +140,18 @@ private:
     void setupCPP (const juce::String& className,
                    juce::OutputStream& cppStream);
 
-    bool createDataFromFile (const juce::File& file,
-                             const juce::String& className,
-                             juce::OutputStream& headerStream,
-                             juce::OutputStream& cppStream,
-                             bool writeVarSpacing);
+    enum CreateResult
+    {
+        CreateCouldntLoad,
+        CreateCancelled,
+        CreateOkay,
+    };
+
+    CreateResult createDataFromFile (const juce::File& file,
+                                     const juce::String& className,
+                                     juce::OutputStream& headerStream,
+                                     juce::OutputStream& cppStream,
+                                     bool writeVarSpacing);
 
     void tryShowInvalidFileList (const juce::Array<juce::File>& invalidFiles);
 
