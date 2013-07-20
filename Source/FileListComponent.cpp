@@ -35,8 +35,16 @@ FileListComponent::FileListComponent()
     setMultipleSelectionEnabled (true);
     setOutlineThickness (2);
     setColour (juce::ListBox::outlineColourId, juce::Colours::white.withAlpha (0.5f));
-    setColour (juce::ListBox::textColourId, juce::Colours::lightgrey);
+    setColour (juce::ListBox::textColourId, juce::Colours::white);
     setColour (juce::ListBox::backgroundColourId, juce::Colours::darkgrey.brighter().withAlpha (0.5f));
+
+    juce::File file ("E:/Programming/FriendlyBinaryBuilder/Builds/VisualStudio2012/FriendlyBinaryBuilder.vcxproj");
+    addFileIfValid (file);
+
+    file = juce::File ("E:/Programming/FriendlyBinaryBuilder/Builds/VisualStudio2012/FriendlyBinaryBuilder.vcxproj.filters");
+    addFileIfValid (file);
+
+    updateContent();
 }
 
 FileListComponent::~FileListComponent()

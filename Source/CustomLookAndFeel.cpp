@@ -3,6 +3,15 @@
 CustomLookAndFeel::CustomLookAndFeel()
 {
     setDefaultSansSerifTypefaceName ("Calibri");
+
+    const juce::Colour buttonColour (juce::Colours::blue.brighter().brighter());
+
+    setColour (juce::TextButton::buttonColourId, buttonColour);
+    setColour (juce::TextButton::buttonOnColourId, buttonColour.brighter (0.75f));
+    setColour (juce::TextButton::textColourOffId, juce::Colours::black);
+    setColour (juce::TextButton::textColourOnId, juce::Colours::black);
+
+    setColour (juce::ToggleButton::textColourId, juce::Colours::white);
 }
 
 CustomLookAndFeel::~CustomLookAndFeel()
@@ -27,7 +36,7 @@ juce::Font CustomLookAndFeel::getLabelFont (juce::Label& label)
 
 juce::Font CustomLookAndFeel::getAlertWindowMessageFont()
 {
-    return juce::Font::getDefaultTypefaceForFont (juce::Font ("Calibri", "Regular", 10.0f));
+    return juce::Font ("Calibri", "Regular", 16.0f);
 }
 
 juce::Font CustomLookAndFeel::getAlertWindowFont()
