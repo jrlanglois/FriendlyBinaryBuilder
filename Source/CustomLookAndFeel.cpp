@@ -2,6 +2,7 @@
 
 CustomLookAndFeel::CustomLookAndFeel()
 {
+/*
     setDefaultSansSerifTypefaceName ("Calibri");
 
     const juce::Colour buttonColour (juce::Colours::blue.brighter().brighter());
@@ -12,6 +13,7 @@ CustomLookAndFeel::CustomLookAndFeel()
     setColour (juce::TextButton::textColourOnId, juce::Colours::black);
 
     setColour (juce::ToggleButton::textColourId, juce::Colours::white);
+*/
 }
 
 CustomLookAndFeel::~CustomLookAndFeel()
@@ -78,7 +80,7 @@ void CustomLookAndFeel::drawButtonBackground (juce::Graphics& g,
                                                      button.hasKeyboardFocus (true),
                                                      isMouseOverButton, isButtonDown)
                                    .withMultipliedAlpha (button.isEnabled() ? 1.0f : 0.5f));
-
+/*
     juce::LookAndFeel::drawGlassLozenge (g,
                                          indentL,
                                          indentT,
@@ -89,6 +91,7 @@ void CustomLookAndFeel::drawButtonBackground (juce::Graphics& g,
                                          button.isConnectedOnRight(),
                                          button.isConnectedOnTop(),
                                          button.isConnectedOnBottom());
+*/
 }
 
 void CustomLookAndFeel::drawToggleButton (juce::Graphics& g, juce::ToggleButton& button,
@@ -96,14 +99,14 @@ void CustomLookAndFeel::drawToggleButton (juce::Graphics& g, juce::ToggleButton&
 {
     const float fontSize = juce::jmin (15.0f, button.getHeight() * 0.75f);
     const float tickWidth = fontSize * 1.1f;
-
+/*
     drawTickBox (g, button, 4.0f, (button.getHeight() - tickWidth) * 0.5f,
                  tickWidth, tickWidth,
                  button.getToggleState(),
                  button.isEnabled(),
                  isMouseOverButton,
                  isButtonDown);
-
+*/
     g.setColour (button.findColour (juce::ToggleButton::textColourId));
     g.setFont (fontSize);
 

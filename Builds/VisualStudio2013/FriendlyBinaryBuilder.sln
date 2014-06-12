@@ -1,6 +1,6 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual C++ Express 2005
-Project("{DA209DB5-D2A1-E157-485C-5B41302258CA}") = "FriendlyBinaryBuilder", "FriendlyBinaryBuilder.vcproj", "{19EE0737-F7F3-E5AF-EBA4-C35A37AD7622}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2013
+Project("{DA209DB5-D2A1-E157-485C-5B41302258CA}") = "FriendlyBinaryBuilder", "FriendlyBinaryBuilder.vcxproj", "{19EE0737-F7F3-E5AF-EBA4-C35A37AD7622}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

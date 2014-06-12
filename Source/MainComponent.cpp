@@ -1,50 +1,21 @@
-/*
-    FriendlyBinaryBuilder: https://github.com/jrlanglois/FriendlyBinaryBuilder
-
-    Copyright (C) 2013 by Joël R. Langlois <joel.r.langlois@gmail.com>
-
-    This library contains portions of other open source products covered by
-    separate licenses. Please see the corresponding source files for specific
-    terms.
-  
-    FriendlyBinaryBuilder is provided under the terms of The MIT License (MIT):
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-    IN THE SOFTWARE.
-*/
 #include "MainComponent.h"
 
 MainComponent::MainComponent()
 {
-    setSize (600, 500);
+    setSize (700, 500);
 
     const juce::Colour buttonColour (juce::Colours::blue.brighter().brighter());
 
-    destDirSelector.setButtonText ("Change directory...");
+    destDirSelector.setButtonText ("Change Directory...");
     destDirSelector.addListener (this);
 
-#ifdef JUCE_WINDOWS
+   #ifdef JUCE_WINDOWS
     destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName() + "\\Generated Binary Files\\", false);
-#else
+   #else
     destDirectory.setText (juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getFullPathName() + "/Generated Binary Files/", false);
-#endif
+   #endif
 
-    className.setText ("Namespace name:", juce::dontSendNotification);
+    className.setText ("File Name:", juce::dontSendNotification);
     className.setJustificationType (juce::Justification::centredRight);
     className.setColour (juce::Label::textColourId, juce::Colours::white);
     classNameEditor.setText (BinaryBuilder::defaultClassName, false);
@@ -56,6 +27,9 @@ MainComponent::MainComponent()
 
     alwaysUseUnsigned.setButtonText ("Always use unsigned for arrays");
     zipDataStreams.setButtonText ("Zip data (uses JUCE/ZLib)");
+
+    alwaysUseUnsigned.setColour (juce::ToggleButton::textColourId, juce::Colours::white);
+    zipDataStreams.setColour (juce::ToggleButton::textColourId, juce::Colours::white);
 
     clearAll.setButtonText ("Clear all");
     clearAll.addListener (this);
@@ -74,10 +48,6 @@ MainComponent::MainComponent()
     addAndMakeVisible (&generate);
 }
 
-MainComponent::~MainComponent()
-{
-}
-
 //==============================================================================
 void MainComponent::paint (juce::Graphics& g)
 {
@@ -86,6 +56,7 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
+    const int width                 = getWidth();
     const int normalCompWidth       = 150;
     const int normalCompHeight      = 25;
     const int borderThickness       = 5;
@@ -118,8 +89,10 @@ void MainComponent::resized()
     }
 
     {
+        const int toggleWidth = width / 2;
+
         alwaysUseUnsigned.setBounds (borderThickness, className.getBottom() + borderThickness,
-                                     200, normalCompHeight);
+                                     toggleWidth, normalCompHeight);
 
         zipDataStreams.setBounds (alwaysUseUnsigned.getBounds().withX (alwaysUseUnsigned.getRight()));
     }

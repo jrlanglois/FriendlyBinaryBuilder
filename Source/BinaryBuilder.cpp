@@ -1,32 +1,3 @@
-/*
-    FriendlyBinaryBuilder: https://github.com/jrlanglois/FriendlyBinaryBuilder
-
-    Copyright (C) 2013 by Joël R. Langlois <joel.r.langlois@gmail.com>
-
-    This library contains portions of other open source products covered by
-    separate licenses. Please see the corresponding source files for specific
-    terms.
-  
-    FriendlyBinaryBuilder is provided under the terms of The MIT License (MIT):
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-    IN THE SOFTWARE.
-*/
 #include "BinaryBuilder.h"
 
 //==============================================================================
@@ -44,10 +15,6 @@ BinaryBuilder::BinaryBuilder (const juce::File& destDir) :
     zipAllDataStreams (false)
 {
     setDestinationDirectory (destDir);
-}
-
-BinaryBuilder::~BinaryBuilder() noexcept
-{
 }
 
 //==============================================================================
@@ -68,7 +35,7 @@ void BinaryBuilder::addFiles (const juce::Array<juce::File>& newFiles)
 
 void BinaryBuilder::clear()
 {
-    files.clear();
+    files.clearQuick();
 }
 
 //==============================================================================
@@ -87,7 +54,7 @@ bool BinaryBuilder::destinationDirectoryExists()
 //==============================================================================
 juce::String BinaryBuilder::createValidVersionOfClassName (const juce::String& className) const
 {
-    const juce::String validClassName (className.trim());
+    juce::String validClassName (className.trim());
 
     if (validClassName.isEmpty())
     {
@@ -98,6 +65,8 @@ juce::String BinaryBuilder::createValidVersionOfClassName (const juce::String& c
 
         return defaultClassName;
     }
+
+    validClassName = validClassName.replaceSection (0, 1, juce::String::charToString (validClassName[0]).toUpperCase()); //Camel-case convention
 
     return validClassName;
 }
@@ -207,27 +176,27 @@ juce::String BinaryBuilder::internalValueType() const noexcept
     if (alwaysUseUnsigned)
         return "const unsigned char*";
 
-    return "const char*"; 
+    return "const char*";
 }
 
 //==============================================================================
 void BinaryBuilder::setupHeader (const juce::String& className, juce::OutputStream& headerStream)
 {
-    headerStream << "#ifndef " << className.toUpperCase() << "_H\r\n"
-                    "#define " << className.toUpperCase() << "_H\r\n\r\n"
-                    "/**\r\n"
-                    "    @file " << className << ".h\r\n"
-                    "    @date " << juce::Time::getCurrentTime().toString (true, true, true, true) << "\r\n"
-                    "    \r\n"
-                    "    Automatically generated binary data\r\n"
-                    "*/\r\n"
-                    "namespace " << className << "\r\n"
-                    "{\r\n";
+    headerStream << "#ifndef " << className.toUpperCase() << "_H" << juce::newLine
+                 << "#define " << className.toUpperCase() << "_H" << juce::newLine << juce::newLine
+                 << "/**" << juce::newLine
+                 << "    @file " << className << ".h" << juce::newLine
+                 << "    @date " << juce::Time::getCurrentTime().toString (true, true, true, true) << juce::newLine
+                 << juce::newLine
+                 << "    Automatically generated binary data" << juce::newLine
+                 << "*/" << juce::newLine
+                 << "namespace " << className << juce::newLine
+                 << "{" << juce::newLine;
 }
 
 void BinaryBuilder::setupCPP (const juce::String& className, juce::OutputStream& cppStream)
 {
-    cppStream << "#include \"" << className << ".h\"\r\n\r\n";
+    cppStream << "#include \"" << className << ".h\"" << juce::newLine << juce::newLine;
 }
 
 //==============================================================================
@@ -251,18 +220,24 @@ BinaryBuilder::CreateResult BinaryBuilder::createDataFromFile (const juce::File&
         mb = memStream.getMemoryBlock();
     }
 
-    const size_t size = mb.getSize();
-
     const juce::String tempVarName (temporaryVariableName() + juce::String (++tempNumber));
     const juce::String chars ("abcdefghijklmnopqrstuvwxyz");
-    const juce::String name (file.getFileName()
-                             .replaceCharacter (' ', '_')
-                             .replaceCharacter ('.', '_')
-                             .retainCharacters ("_0123456789" + chars.toLowerCase() + chars.toUpperCase()));
 
-    //Write to the Header file:
+    juce::String name (file.getFileName().trim());
+
+    name = name.replaceSection (0, 1, juce::String (name.toLowerCase())) //Camel-back notation for variables
+               .replaceCharacter (' ', '_')
+               .replaceCharacter ('.', '_')
+               .retainCharacters ("_0123456789" + chars.toLowerCase() + chars.toUpperCase());
+
+    if (zipAllDataStreams)
+        name << "_Zipped";
+
+    //Write to the header file:
+    const std::size_t size = mb.getSize();
+
     headerStream << "    extern " << externValueType() << " " << name << ";\r\n";
-    headerStream << "    const int          " << name << "Size = " << juce::String (size) << ";\r\n";
+    headerStream << "    const int          " << name << "_Size = " << juce::String (size) << ";\r\n";
 
     if (writeVarSpacing)
         headerStream << "\r\n";
@@ -272,7 +247,7 @@ BinaryBuilder::CreateResult BinaryBuilder::createDataFromFile (const juce::File&
 
     const juce::uint8* const data = (const juce::uint8*) mb.getData();
 
-    size_t i = 0;
+    std::size_t i = 0;
     while (i < (size - 1))
     {
         cppStream << (int) data[i] << ",";
@@ -308,8 +283,8 @@ void BinaryBuilder::generateBinaries (const bool useUnsigned, const bool zipData
         alwaysUseUnsigned = useUnsigned;
         zipAllDataStreams = zipDataStreams;
 
-        const juce::File headerFile (destinationDirectory.getChildFile (className).withFileExtension (".h"));
-        const juce::File cppFile (destinationDirectory.getChildFile (className).withFileExtension (".cpp"));
+        const juce::File headerFile (destinationDirectory.getChildFile (validClassName).withFileExtension (".h"));
+        const juce::File cppFile (destinationDirectory.getChildFile (validClassName).withFileExtension (".cpp"));
 
         headerFile.deleteFile();
         cppFile.deleteFile();
@@ -319,8 +294,8 @@ void BinaryBuilder::generateBinaries (const bool useUnsigned, const bool zipData
 
         if (header != nullptr && cpp != nullptr)
         {
-            setupHeader (className, *header);
-            setupCPP (className, *cpp);
+            setupHeader (validClassName, *header);
+            setupCPP (validClassName, *cpp);
 
             tempNumber = 0;
 
@@ -333,7 +308,7 @@ void BinaryBuilder::generateBinaries (const bool useUnsigned, const bool zipData
             for (int i = 0; i < numFiles; ++i)
             {
                 const juce::File& fileToProcess = files.getReference (i);
-                const CreateResult result =  createDataFromFile (fileToProcess, className,
+                const CreateResult result =  createDataFromFile (fileToProcess, validClassName,
                                                                  *header, *cpp, i != (numFiles - 1));
 
                 switch (result)
@@ -346,14 +321,15 @@ void BinaryBuilder::generateBinaries (const bool useUnsigned, const bool zipData
                         deleteFiles = true;
                     break;
 
-                    default: break;
+                    default:
+                    break;
                 };
 
                 if (deleteFiles)
                     break;
             }
 
-            *header << "}\r\n\r\n" << "#endif //" << className.toUpperCase() << "_H";
+            *header << "}" << juce::newLine << juce::newLine << "#endif //" << validClassName.toUpperCase() << "_H";
             header = cpp = nullptr;
 
             if (deleteFiles)
@@ -398,12 +374,12 @@ void BinaryBuilder::tryShowInvalidFileList (const juce::Array<juce::File>& inval
 }
 
 //==============================================================================
-void BinaryBuilder::addProgressCounter (ProgressCounter* counter)
+void BinaryBuilder::addProgressCounter (ProgressCounter* const counter)
 {
     progressCounters.add (counter);
 }
 
-void BinaryBuilder::removeProgressCounter (ProgressCounter* counter)
+void BinaryBuilder::removeProgressCounter (ProgressCounter* const counter)
 {
     progressCounters.remove (counter);
 }
