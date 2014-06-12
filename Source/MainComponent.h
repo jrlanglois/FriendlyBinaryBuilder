@@ -25,13 +25,9 @@ private:
     FileListComponent currentFiles;
 
     juce::Label className;
-    juce::ToggleButton alwaysUseUnsigned;
-    juce::ToggleButton zipDataStreams;
-    juce::TextEditor destDirectory;
-    juce::TextEditor classNameEditor;
-    juce::TextButton destDirSelector;
-    juce::TextButton clearAll;
-    juce::TextButton generate;
+    juce::ToggleButton alwaysUseUnsigned, zipDataStreams;
+    juce::TextEditor destDirectory, classNameEditor;
+    juce::TextButton destDirSelector, clearAll, generate;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent);

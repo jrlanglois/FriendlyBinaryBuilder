@@ -35,7 +35,7 @@ public:
 private:
     //==============================================================================
     juce::ScopedPointer<MainWindow> mainWindow;
-    juce::LookAndFeel_V3 lookAndFeel;
+    CustomLookAndFeel lookAndFeel;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FriendlyBinaryBuilderApplication)
